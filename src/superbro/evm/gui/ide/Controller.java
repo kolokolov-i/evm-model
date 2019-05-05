@@ -47,17 +47,14 @@ public class Controller implements Initializable {
     }
     @FXML
     public void btnActionTranslate(ActionEvent e){
-        System.out.println("translate");
         String srcCode = textCode.getText();
         String srcData = textData.getText();
         Translator trans = new AsmTranslator(srcCode, srcData);
         boolean success = trans.translate();
         messageList.getItems().addAll(trans.getMessages());
-        if(success){
-            binCode.setText(trans.getListingCode());
-            binData.setText(trans.getListingData());
-        }
-        else{
+        binCode.setText(trans.getListingCode());
+        binData.setText(trans.getListingData());
+        if(!success){
 
         }
     }

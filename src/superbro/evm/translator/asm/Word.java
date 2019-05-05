@@ -1,11 +1,11 @@
 package superbro.evm.translator.asm;
 
-public class Word extends Token {
+class Word extends Token {
 
     final String lexeme;
 
-    public Word(Tag tag, String s) {
-        super(tag);
+    Word(Tag tag, String s, int n) {
+        super(tag, n);
         lexeme = s;
     }
 }

@@ -1,11 +1,11 @@
 package superbro.evm.translator.asm;
 
-public class Number extends Token {
+class Number extends Token {
 
     final int value;
 
-    public Number(int v){
-        super(Tag.NUMBER);
+    Number(int v, int n){
+        super(Tag.NUMBER, n);
         value = v;
     }
 }

@@ -6,30 +6,28 @@ import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Lexer {
+class Lexer {
 
-    StringReader reader;
-    List<Token> result;
-    List<ErrorRecord> eList;
-    String[] lines;
+    private StringReader reader;
+    private List<Token> result;
+    private List<ErrorRecord> eList;
+    private String[] lines;
 
-    public Lexer(String src, List<ErrorRecord> errList) {
+    Lexer(String src, List<ErrorRecord> errList) {
         reader = new StringReader(src);
         lines = src.split("\n");
         result = new ArrayList<>(100);
         eList = errList;
     }
 
-    public boolean scan() {
+    boolean scan() {
         boolean r = true;
-        int curLineNumber = 0;
         char c;
         StringBuffer sbuf = new StringBuffer();
         for (int j = 0; j<lines.length; j++) {
             String line = lines[j];
-            ParserState state = ParserState.S0;
+            State state = State.S0;
             int i = 0;
-            curLineNumber++;
             boolean lineLoopFlag = true;
             while (lineLoopFlag) {
                 if (i >= line.length()) {
@@ -45,28 +43,28 @@ public class Lexer {
                             case p:
                                 break;
                             case n:
-                                result.add(new Token(Tag.END));
+                                result.add(new Token(Tag.END, j));
                                 lineLoopFlag = false;
                                 break;
                             case a:
-                                state = ParserState.S1;
+                                state = State.S1;
                                 sbuf.append(c);
                                 break;
                             case d:
                                 if (c == '0') {
-                                    state = ParserState.S2;
+                                    state = State.S2;
                                 } else {
                                     sbuf.append(c);
-                                    state = ParserState.S3;
+                                    state = State.S3;
                                 }
                                 break;
                             case m:
-                                result.add(new Token(Tag.COMMA));
+                                result.add(new Token(Tag.COMMA, j));
                                 break;
                             case other:
-                                eList.add(new ErrorRecord(curLineNumber, i, "Unknow symbol"));
+                                eList.add(new ErrorRecord(j, i, "Unknow symbol"));
                                 r = false;
-                                result.add(new Token(Tag.END));
+                                result.add(new Token(Tag.END, j));
                                 lineLoopFlag = false;
                                 break;
                         }
@@ -74,14 +72,14 @@ public class Lexer {
                     case S1:
                         switch (charCat) {
                             case p:
-                                result.add(new Word(Tag.ID, sbuf.toString()));
+                                result.add(new Word(Tag.ID, sbuf.toString(), j));
                                 sbuf.delete(0, sbuf.length());
-                                state = ParserState.S0;
+                                state = State.S0;
                                 break;
                             case n:
-                                result.add(new Word(Tag.ID, sbuf.toString()));
+                                result.add(new Word(Tag.ID, sbuf.toString(), j));
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.END));
+                                result.add(new Token(Tag.END, j));
                                 lineLoopFlag = false;
                                 break;
                             case a:
@@ -89,16 +87,15 @@ public class Lexer {
                                 sbuf.append(c);
                                 break;
                             case m:
-                                sbuf.append(c);
-                                result.add(new Word(Tag.ID, sbuf.toString()));
+                                result.add(new Word(Tag.ID, sbuf.toString(), j));
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.COMMA));
-                                state = ParserState.S0;
+                                result.add(new Token(Tag.COMMA, j));
+                                state = State.S0;
                                 break;
                             case other:
-                                eList.add(new ErrorRecord(curLineNumber, i, "Unknown symbol"));
+                                eList.add(new ErrorRecord(j, i, "Unknown symbol"));
                                 r = false;
-                                result.add(new Token(Tag.END));
+                                result.add(new Token(Tag.END, j));
                                 lineLoopFlag = false;
                                 break;
                         }
@@ -106,42 +103,42 @@ public class Lexer {
                     case S2:
                         switch (charCat) {
                             case p:
-                                result.add(new Number(0));
-                                state = ParserState.S0;
+                                result.add(new Number(0, j));
+                                state = State.S0;
                                 break;
                             case n:
-                                result.add(new Number(0));
-                                result.add(new Token(Tag.END));
-                                state = ParserState.S0;
+                                result.add(new Number(0, j));
+                                result.add(new Token(Tag.END, j));
+                                state = State.S0;
                                 lineLoopFlag = false;
                                 break;
                             case a:
                                 if (c == 'b') {
-                                    state = ParserState.S4;
+                                    state = State.S4;
                                 } else if (c == 'x') {
-                                    state = ParserState.S5;
+                                    state = State.S5;
                                 } else {
-                                    eList.add(new ErrorRecord(curLineNumber, i, "Invalid identificator"));
+                                    eList.add(new ErrorRecord(j, i, "Invalid identificator"));
                                     r = false;
-                                    result.add(new Token(Tag.END));
-                                    state = ParserState.S0;
+                                    result.add(new Token(Tag.END, j));
+                                    state = State.S0;
                                     lineLoopFlag = false;
                                     break;
                                 }
                                 break;
                             case d:
                                 sbuf.append(c);
-                                state = ParserState.S3;
+                                state = State.S3;
                                 break;
                             case m:
-                                result.add(new Number(0));
-                                result.add(new Token(Tag.COMMA));
-                                state = ParserState.S0;
+                                result.add(new Number(0, j));
+                                result.add(new Token(Tag.COMMA, j));
+                                state = State.S0;
                                 break;
                             case other:
-                                eList.add(new ErrorRecord(curLineNumber, i, "Unknown symbol"));
+                                eList.add(new ErrorRecord(j, i, "Unknown symbol"));
                                 r = false;
-                                result.add(new Token(Tag.END));
+                                result.add(new Token(Tag.END, j));
                                 lineLoopFlag = false;
                                 break;
                         }
@@ -149,35 +146,35 @@ public class Lexer {
                     case S3:
                         switch (charCat) {
                             case p:
-                                result.add(new Number(Integer.parseInt(sbuf.toString())));
+                                result.add(new Number(Integer.parseInt(sbuf.toString()), j));
                                 sbuf.delete(0, sbuf.length());
-                                state = ParserState.S0;
+                                state = State.S0;
                                 break;
                             case n:
-                                result.add(new Number(Integer.parseInt(sbuf.toString())));
+                                result.add(new Number(Integer.parseInt(sbuf.toString()), j));
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.END));
+                                result.add(new Token(Tag.END, j));
                                 lineLoopFlag = false;
                                 break;
                             case a:
-                                eList.add(new ErrorRecord(curLineNumber, i, "Invalid number"));
+                                eList.add(new ErrorRecord(j, i, "Invalid number"));
                                 r = false;
-                                result.add(new Token(Tag.END));
+                                result.add(new Token(Tag.END, j));
                                 lineLoopFlag = false;
                                 break;
                             case d:
                                 sbuf.append(c);
                                 break;
                             case m:
-                                result.add(new Number(Integer.parseInt(sbuf.toString())));
+                                result.add(new Number(Integer.parseInt(sbuf.toString()), j));
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.COMMA));
-                                state = ParserState.S0;
+                                result.add(new Token(Tag.COMMA, j));
+                                state = State.S0;
                                 break;
                             case other:
-                                eList.add(new ErrorRecord(curLineNumber, i, "Unknown symbol"));
+                                eList.add(new ErrorRecord(j, i, "Unknown symbol"));
                                 r = false;
-                                result.add(new Token(Tag.END));
+                                result.add(new Token(Tag.END, j));
                                 lineLoopFlag = false;
                                 break;
                         }
@@ -185,35 +182,35 @@ public class Lexer {
                     case S4:
                         switch (charCat) {
                             case p:
-                                result.add(new Number(Integer.parseInt(sbuf.toString(), 2)));
+                                result.add(new Number(Integer.parseInt(sbuf.toString(), 2), j));
                                 sbuf.delete(0, sbuf.length());
-                                state = ParserState.S0;
+                                state = State.S0;
                                 break;
                             case n:
-                                result.add(new Number(Integer.parseInt(sbuf.toString(), 2)));
+                                result.add(new Number(Integer.parseInt(sbuf.toString(), 2), j));
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.END));
+                                result.add(new Token(Tag.END, j));
                                 lineLoopFlag = false;
                                 break;
                             case a:
-                                eList.add(new ErrorRecord(curLineNumber, i, "Invalid number"));
+                                eList.add(new ErrorRecord(j, i, "Invalid number"));
                                 r = false;
-                                result.add(new Token(Tag.END));
+                                result.add(new Token(Tag.END, j));
                                 lineLoopFlag = false;
                                 break;
                             case d:
                                 sbuf.append(c);
                                 break;
                             case m:
-                                result.add(new Number(Integer.parseInt(sbuf.toString(), 2)));
+                                result.add(new Number(Integer.parseInt(sbuf.toString(), 2), j));
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.COMMA));
-                                state = ParserState.S0;
+                                result.add(new Token(Tag.COMMA, j));
+                                state = State.S0;
                                 break;
                             case other:
-                                eList.add(new ErrorRecord(curLineNumber, i, "Unknown symbol"));
+                                eList.add(new ErrorRecord(j, i, "Unknown symbol"));
                                 r = false;
-                                result.add(new Token(Tag.END));
+                                result.add(new Token(Tag.END, j));
                                 lineLoopFlag = false;
                                 break;
                         }
@@ -221,14 +218,14 @@ public class Lexer {
                     case S5:
                         switch (charCat) {
                             case p:
-                                result.add(new Number(Integer.parseInt(sbuf.toString(), 16)));
+                                result.add(new Number(Integer.parseInt(sbuf.toString(), 16), j));
                                 sbuf.delete(0, sbuf.length());
-                                state = ParserState.S0;
+                                state = State.S0;
                                 break;
                             case n:
-                                result.add(new Number(Integer.parseInt(sbuf.toString(), 16)));
+                                result.add(new Number(Integer.parseInt(sbuf.toString(), 16), j));
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.END));
+                                result.add(new Token(Tag.END, j));
                                 lineLoopFlag = false;
                                 break;
                             case a:
@@ -242,9 +239,9 @@ public class Lexer {
                                         sbuf.append(c);
                                         break;
                                     default:
-                                        eList.add(new ErrorRecord(curLineNumber, i, "Invalid number"));
+                                        eList.add(new ErrorRecord(j, i, "Invalid number"));
                                         r = false;
-                                        result.add(new Token(Tag.END));
+                                        result.add(new Token(Tag.END, j));
                                         lineLoopFlag = false;
                                 }
                                 break;
@@ -252,15 +249,15 @@ public class Lexer {
                                 sbuf.append(c);
                                 break;
                             case m:
-                                result.add(new Number(Integer.parseInt(sbuf.toString(), 16)));
+                                result.add(new Number(Integer.parseInt(sbuf.toString(), 16), j));
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.COMMA));
-                                state = ParserState.S0;
+                                result.add(new Token(Tag.COMMA, j));
+                                state = State.S0;
                                 break;
                             case other:
-                                eList.add(new ErrorRecord(curLineNumber, i, "Unknown symbol"));
+                                eList.add(new ErrorRecord(j, i, "Unknown symbol"));
                                 r = false;
-                                result.add(new Token(Tag.END));
+                                result.add(new Token(Tag.END, j));
                                 lineLoopFlag = false;
                                 break;
                         }
@@ -274,11 +271,11 @@ public class Lexer {
         return r;
     }
 
-    public List<Token> getResult() {
+    List<Token> getResult() {
         return result;
     }
 
-    private enum ParserState {
-        S0, S1, S2, S3, S4, S5, F1;
+    private enum State {
+        S0, S1, S2, S3, S4, S5, F1
     }
 }

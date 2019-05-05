@@ -1,10 +1,12 @@
 package superbro.evm.translator.asm;
 
-public class Token {
+class Token {
 
     Tag tag;
+    int line;
 
-    public Token(Tag tag) {
+    Token(Tag tag, int n) {
         this.tag = tag;
+        line = n;
     }
 }
