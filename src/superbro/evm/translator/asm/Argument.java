@@ -1,8 +1,8 @@
 package superbro.evm.translator.asm;
 
-class Argument {
-    Type type;
-    int value;
+public class Argument {
+    public Type type;
+    public int value;
 
     Argument(Type type, int v) {
         this.type = type;

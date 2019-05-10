@@ -1,7 +1,7 @@
 package superbro.evm.translator.asm;
 
-class ParserException extends Exception {
-    ParserException(String message) {
+public class ParserException extends Exception {
+    public ParserException(String message) {
         super(message);
     }
 }

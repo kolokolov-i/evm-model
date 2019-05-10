@@ -1,5 +1,7 @@
 package superbro.evm.translator.asm;
 
+import superbro.evm.translator.asm.cmd.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -12,10 +14,65 @@ class Instruct {
 
     static {
         commandMap = new HashMap<>();
-        commandMap.put("MOV", new Command.MOV());
-        commandMap.put("MOVI", new Command.MOVI());
-        commandMap.put("INT", new Command.INT());
-        commandMap.put("ADD", new Command.ADD());
+        commandMap.put("NOP", new NOP());
+        commandMap.put("CALL", new CALL());
+        commandMap.put("RCALL", new RCALL());
+        commandMap.put("RET", new RET());
+        commandMap.put("RETN", new RETN());
+        commandMap.put("INT", new INT());
+        commandMap.put("IRET", new IRET());
+        commandMap.put("JUMP", new JUMP());
+        commandMap.put("RJMP", new RJMP());
+        commandMap.put("RJMPZ", new RJMPZ());
+        commandMap.put("RJMPS", new RJMPS());
+        commandMap.put("RJMPC", new RJMPC());
+        commandMap.put("RJMPO", new RJMPO());
+        commandMap.put("RJMPNZ", new RJMPNZ());
+        commandMap.put("RJMPNS", new RJMPNS());
+        commandMap.put("RJMPNC", new RJMPNC());
+        commandMap.put("RJMPNO", new RJMPNO());
+        commandMap.put("CMP", new CMP());
+        commandMap.put("CMPI", new CMPI());
+        commandMap.put("TST", new TST());
+        commandMap.put("FSZ", new FSZ());
+        commandMap.put("FSS", new FSS());
+        commandMap.put("FSC", new FSC());
+        commandMap.put("FSO", new FSO());
+        commandMap.put("FST", new FST());
+        commandMap.put("FSI", new FSI());
+        commandMap.put("FCZ", new FCZ());
+        commandMap.put("FCS", new FCS());
+        commandMap.put("FCC", new FCC());
+        commandMap.put("FCO", new FCO());
+        commandMap.put("FCT", new FCT());
+        commandMap.put("FCI", new FCI());
+        commandMap.put("AND", new AND());
+        commandMap.put("ANDI", new ANDI());
+        commandMap.put("OR", new OR());
+        commandMap.put("ORI", new ORI());
+        commandMap.put("XOR", new XOR());
+        commandMap.put("XORI", new XORI());
+        commandMap.put("NOT", new NOT());
+        commandMap.put("NEG", new NEG());
+        commandMap.put("CLR", new CLR());
+        commandMap.put("SWPH", new SWPH());
+        commandMap.put("LSL", new LSL());
+        commandMap.put("LSR", new LSR());
+        commandMap.put("ROL", new ROL());
+        commandMap.put("ROR", new ROR());
+        commandMap.put("ASR", new ASR());
+        commandMap.put("ADD", new ADD());
+        commandMap.put("ADDI", new ADDI());
+        commandMap.put("INC", new INC());
+        commandMap.put("SUB", new SUB());
+        commandMap.put("SUBI", new SUBI());
+        commandMap.put("DEC", new DEC());
+        commandMap.put("MUL", new MUL());
+        commandMap.put("DIV", new DIV());
+        commandMap.put("MOD", new MOD());
+        commandMap.put("MOV", new MOV());
+        commandMap.put("MOVI", new MOVI());
+        commandMap.put("SWAP", new SWAP());
     }
 
     private static HashMap<String, Argument> words;
