@@ -24,7 +24,7 @@ class Lexer {
         boolean r = true;
         char c;
         StringBuffer sbuf = new StringBuffer();
-        for (int j = 0; j<lines.length; j++) {
+        for (int j = 0; j < lines.length; j++) {
             String line = lines[j];
             State state = State.S0;
             int i = 0;
@@ -61,6 +61,9 @@ class Lexer {
                             case m:
                                 result.add(new Token(Tag.COMMA, j));
                                 break;
+                            case s:
+                                result.add(new Token(Tag.SEMICOLON, j));
+                                break;
                             case other:
                                 eList.add(new ErrorRecord(j, i, "Unknow symbol"));
                                 r = false;
@@ -92,6 +95,12 @@ class Lexer {
                                 result.add(new Token(Tag.COMMA, j));
                                 state = State.S0;
                                 break;
+                            case s:
+                                result.add(new Word(Tag.ID, sbuf.toString(), j));
+                                sbuf.delete(0, sbuf.length());
+                                result.add(new Token(Tag.SEMICOLON, j));
+                                state = State.S0;
+                                break;
                             case other:
                                 eList.add(new ErrorRecord(j, i, "Unknown symbol"));
                                 r = false;
@@ -118,7 +127,7 @@ class Lexer {
                                 } else if (c == 'x') {
                                     state = State.S5;
                                 } else {
-                                    eList.add(new ErrorRecord(j, i, "Invalid identificator"));
+                                    eList.add(new ErrorRecord(j, i, "Invalid identifier"));
                                     r = false;
                                     result.add(new Token(Tag.END, j));
                                     state = State.S0;
@@ -133,6 +142,11 @@ class Lexer {
                             case m:
                                 result.add(new Number(0, j));
                                 result.add(new Token(Tag.COMMA, j));
+                                state = State.S0;
+                                break;
+                            case s:
+                                result.add(new Number(0, j));
+                                result.add(new Token(Tag.SEMICOLON, j));
                                 state = State.S0;
                                 break;
                             case other:
@@ -151,13 +165,19 @@ class Lexer {
                                 state = State.S0;
                                 break;
                             case n:
-                                result.add(new Number(Integer.parseInt(sbuf.toString()), j));
+                                try{
+                                    result.add(new Number(Integer.parseInt(sbuf.toString()), j));
+                                }
+                                catch(NumberFormatException ex){
+                                    eList.add(new ErrorRecord(j, i, "Invalid number " + sbuf.toString()));
+                                }
                                 sbuf.delete(0, sbuf.length());
                                 result.add(new Token(Tag.END, j));
                                 lineLoopFlag = false;
                                 break;
                             case a:
-                                eList.add(new ErrorRecord(j, i, "Invalid number"));
+                                sbuf.append(c);
+                                eList.add(new ErrorRecord(j, i, "Invalid number " + sbuf.toString()));
                                 r = false;
                                 result.add(new Token(Tag.END, j));
                                 lineLoopFlag = false;
@@ -169,6 +189,12 @@ class Lexer {
                                 result.add(new Number(Integer.parseInt(sbuf.toString()), j));
                                 sbuf.delete(0, sbuf.length());
                                 result.add(new Token(Tag.COMMA, j));
+                                state = State.S0;
+                                break;
+                            case s:
+                                result.add(new Number(Integer.parseInt(sbuf.toString()), j));
+                                sbuf.delete(0, sbuf.length());
+                                result.add(new Token(Tag.SEMICOLON, j));
                                 state = State.S0;
                                 break;
                             case other:
@@ -187,24 +213,42 @@ class Lexer {
                                 state = State.S0;
                                 break;
                             case n:
-                                result.add(new Number(Integer.parseInt(sbuf.toString(), 2), j));
+                                try{
+                                    result.add(new Number(Integer.parseInt(sbuf.toString(), 2), j));
+                                }
+                                catch(NumberFormatException ex){
+                                    eList.add(new ErrorRecord(j, i, "Invalid number " + sbuf.toString()));
+                                }
                                 sbuf.delete(0, sbuf.length());
                                 result.add(new Token(Tag.END, j));
                                 lineLoopFlag = false;
                                 break;
                             case a:
-                                eList.add(new ErrorRecord(j, i, "Invalid number"));
+                                sbuf.append(c);
+                                eList.add(new ErrorRecord(j, i, "Invalid number " + sbuf.toString()));
                                 r = false;
                                 result.add(new Token(Tag.END, j));
                                 lineLoopFlag = false;
                                 break;
                             case d:
                                 sbuf.append(c);
+                                if (c != '0' && c != '1') {
+                                    eList.add(new ErrorRecord(j, i, "Invalid number " + sbuf.toString()));
+                                    r = false;
+                                    result.add(new Token(Tag.END, j));
+                                    lineLoopFlag = false;
+                                }
                                 break;
                             case m:
                                 result.add(new Number(Integer.parseInt(sbuf.toString(), 2), j));
                                 sbuf.delete(0, sbuf.length());
                                 result.add(new Token(Tag.COMMA, j));
+                                state = State.S0;
+                                break;
+                            case s:
+                                result.add(new Number(Integer.parseInt(sbuf.toString(), 2), j));
+                                sbuf.delete(0, sbuf.length());
+                                result.add(new Token(Tag.SEMICOLON, j));
                                 state = State.S0;
                                 break;
                             case other:
@@ -223,23 +267,35 @@ class Lexer {
                                 state = State.S0;
                                 break;
                             case n:
-                                result.add(new Number(Integer.parseInt(sbuf.toString(), 16), j));
+                                try{
+                                    result.add(new Number(Integer.parseInt(sbuf.toString(), 16), j));
+                                }
+                                catch(NumberFormatException ex){
+                                    eList.add(new ErrorRecord(j, i, "Invalid number " + sbuf.toString()));
+                                }
                                 sbuf.delete(0, sbuf.length());
                                 result.add(new Token(Tag.END, j));
                                 lineLoopFlag = false;
                                 break;
                             case a:
-                                switch(c){
-                                    case 'a':    case 'A':
-                                    case 'b':    case 'B':
-                                    case 'c':    case 'C':
-                                    case 'd':    case 'D':
-                                    case 'e':    case 'E':
-                                    case 'f':    case 'F':
+                                switch (c) {
+                                    case 'a':
+                                    case 'A':
+                                    case 'b':
+                                    case 'B':
+                                    case 'c':
+                                    case 'C':
+                                    case 'd':
+                                    case 'D':
+                                    case 'e':
+                                    case 'E':
+                                    case 'f':
+                                    case 'F':
                                         sbuf.append(c);
                                         break;
                                     default:
-                                        eList.add(new ErrorRecord(j, i, "Invalid number"));
+                                        sbuf.append(c);
+                                        eList.add(new ErrorRecord(j, i, "Invalid number " + sbuf.toString()));
                                         r = false;
                                         result.add(new Token(Tag.END, j));
                                         lineLoopFlag = false;
@@ -254,6 +310,12 @@ class Lexer {
                                 result.add(new Token(Tag.COMMA, j));
                                 state = State.S0;
                                 break;
+                            case s:
+                                result.add(new Number(Integer.parseInt(sbuf.toString(), 16), j));
+                                sbuf.delete(0, sbuf.length());
+                                result.add(new Token(Tag.SEMICOLON, j));
+                                state = State.S0;
+                                break;
                             case other:
                                 eList.add(new ErrorRecord(j, i, "Unknown symbol"));
                                 r = false;
@@ -261,8 +323,6 @@ class Lexer {
                                 lineLoopFlag = false;
                                 break;
                         }
-                        break;
-                    case F1:
                         break;
                 }
                 i++;
@@ -276,6 +336,6 @@ class Lexer {
     }
 
     private enum State {
-        S0, S1, S2, S3, S4, S5, F1
+        S0, S1, S2, S3, S4, S5
     }
 }

@@ -1,7 +1,7 @@
 package superbro.evm.translator.asm;
 
 public enum CharCategory {
-    p, a, d, m, n, other;
+    p, a, d, m, n, s, other;
 
     static CharCategory get(char c){
         switch(c){
@@ -11,6 +11,8 @@ public enum CharCategory {
             case '\n':
             case ';':
                 return CharCategory.n;
+            case ':':
+                return CharCategory.s;
             case ',':
                 return CharCategory.m;
             case '0':

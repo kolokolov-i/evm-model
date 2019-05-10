@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import java.lang.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -79,9 +80,9 @@
       </TabPane>
    </right>
    <bottom>
-      <Accordion BorderPane.alignment="CENTER">
+      <Accordion fx:id="messageAccordion" BorderPane.alignment="CENTER">
         <panes>
-          <TitledPane animated="false" text="Messages">
+          <TitledPane fx:id="messagePane" animated="false" text="Messages">
                <content>
                   <ListView fx:id="messageList" prefHeight="200.0" prefWidth="200.0" />
                </content>

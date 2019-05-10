@@ -3,8 +3,10 @@ package superbro.evm.gui.ide;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.scene.control.Accordion;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TitledPane;
 import superbro.evm.translator.Translator;
 import superbro.evm.translator.asm.AsmTranslator;
 
@@ -23,6 +25,10 @@ public class Controller implements Initializable {
     TextArea binData;
     @FXML
     ListView<String> messageList;
+    @FXML
+    Accordion messageAccordion;
+    @FXML
+    TitledPane messagePane;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -51,11 +57,12 @@ public class Controller implements Initializable {
         String srcData = textData.getText();
         Translator trans = new AsmTranslator(srcCode, srcData);
         boolean success = trans.translate();
+        messageList.getItems().clear();
         messageList.getItems().addAll(trans.getMessages());
         binCode.setText(trans.getListingCode());
         binData.setText(trans.getListingData());
         if(!success){
-
+            messageAccordion.setExpandedPane(messagePane);
         }
     }
 }
