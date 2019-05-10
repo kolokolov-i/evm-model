@@ -1,12 +1,9 @@
 package superbro.evm.translator;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public abstract class Translator {
 
     protected String sourceCode, sourceData;
-    protected List<String> messages;
+    protected Messager messager;
     protected String listingCode, listingData;
     protected byte[] rawCode, rawData;
 
@@ -16,7 +13,7 @@ public abstract class Translator {
     public Translator(String srcCode, String srcData) {
         sourceCode = srcCode;
         sourceData = srcData;
-        messages = new ArrayList<>();
+        messager = new Messager();
     }
 
     public abstract boolean translate();
@@ -29,8 +26,8 @@ public abstract class Translator {
         this.sourceData = sourceData;
     }
 
-    public List<String> getMessages(){
-        return messages;
+    public Messager getMessager(){
+        return messager;
     }
 
     public String getListingCode() {

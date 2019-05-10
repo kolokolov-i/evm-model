@@ -1,6 +1,6 @@
 package superbro.evm.translator.asm;
 
-import superbro.evm.translator.ErrorRecord;
+import superbro.evm.translator.MessageRecord;
 import superbro.evm.translator.Translator;
 
 import java.util.ArrayList;
@@ -18,25 +18,25 @@ public class AsmTranslator extends Translator {
 
     @Override
     public boolean translate() {
-        init();
+        success = true;
         translateCode();
         return success;
     }
 
     private boolean success;
 
-    private void init() {
-        messages.clear();
-        success = true;
-    }
-
     private void translateCode() {
-        List<ErrorRecord> eList = new ArrayList<>();
-        Lexer lexer = new Lexer(sourceCode, eList);
+        Lexer lexer = new Lexer(sourceCode, messager);
         success = lexer.scan();
+        if(!success){
+            return;
+        }
         List<Token> tokens = lexer.getResult();
-        Syntaxer syntaxer = new Syntaxer(tokens, eList);
+        Syntaxer syntaxer = new Syntaxer(tokens, messager);
         success = syntaxer.parse();
+        if(!success){
+            return;
+        }
         List<Instruct> instructs = syntaxer.getResult();
         ArrayList<Short> r = new ArrayList<>(1000);
         StringBuilder listingBuilder = new StringBuilder();
@@ -44,15 +44,12 @@ public class AsmTranslator extends Translator {
             try {
                 j.generate(r);
             } catch (ParserException ex) {
-                eList.add(new ErrorRecord(0, 0, ex.getMessage()));
+                messager.error(0, 0, ex.getMessage());
             }
         }
         for(Short t : r){
             listingBuilder.append(String.format("%04x\n", t));
         }
         listingCode = listingBuilder.toString();
-        for (ErrorRecord e : eList) {
-            messages.add(e.toString());
-        }
     }
 }

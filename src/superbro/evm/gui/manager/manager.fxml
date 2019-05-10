@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.image.*?>
 <?import javafx.geometry.*?>
 <?import javafx.scene.paint.*?>
 <?import javafx.scene.shape.*?>
@@ -38,11 +39,19 @@
                            </font>
                         </Label>
                         <Separator layoutX="1.0" layoutY="44.0" prefHeight="0.0" prefWidth="449.0" />
-                        <Pane layoutX="14.0" layoutY="47.0" prefHeight="250.0" prefWidth="400.0">
+                        <Pane layoutX="14.0" layoutY="47.0">
                            <children>
-                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#1f93ff" height="58.0" layoutX="42.0" layoutY="25.0" stroke="BLACK" strokeType="INSIDE" width="109.0" />
-                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ff411f" height="82.0" layoutX="72.0" layoutY="116.0" stroke="BLACK" strokeType="INSIDE" width="173.0" />
-                              <Rectangle fx:id="rectGreen" arcHeight="5.0" arcWidth="5.0" fill="#15b94c" height="200.0" layoutX="282.0" layoutY="16.0" onMouseClicked="#greenRectClick" stroke="BLACK" strokeType="INSIDE" width="84.0" />
+                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#1f93ff" height="250.0" layoutX="2.0" layoutY="1.0" stroke="BLACK" strokeType="INSIDE" width="400.0" />
+                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#ff411f" height="67.0" layoutX="29.0" layoutY="33.0" stroke="BLACK" strokeType="INSIDE" width="94.0" />
+                              <Rectangle fx:id="rectGreen" arcHeight="5.0" arcWidth="5.0" fill="#15b94c" height="183.0" layoutX="268.0" layoutY="33.0" onMouseClicked="#greenRectClick" stroke="BLACK" strokeType="INSIDE" width="98.0" />
+                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#cdcdcd" height="64.0" layoutX="29.0" layoutY="152.0" stroke="BLACK" strokeType="INSIDE" width="98.0" />
+                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#cdcdcd" height="64.0" layoutX="143.0" layoutY="152.0" stroke="BLACK" strokeType="INSIDE" width="98.0" />
+                              <Rectangle arcHeight="5.0" arcWidth="5.0" fill="#faffa1" height="79.0" layoutX="145.0" layoutY="33.0" stroke="BLACK" strokeType="INSIDE" width="94.0" />
+                              <Text fill="#8d8d8d" layoutX="169.0" layoutY="80.0" strokeType="OUTSIDE" strokeWidth="0.0" text="CPU">
+                                 <font>
+                                    <Font name="Gill Sans MT" size="24.0" />
+                                 </font>
+                              </Text>
                            </children>
                         </Pane>
                      </children></AnchorPane>

@@ -1,29 +1,26 @@
 package superbro.evm.translator.asm;
 
-import superbro.evm.translator.ErrorRecord;
+import superbro.evm.translator.Messager;
 
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
 
 class Lexer {
 
-    private StringReader reader;
     private List<Token> result;
-    private List<ErrorRecord> eList;
+    private Messager messager;
     private String[] lines;
 
-    Lexer(String src, List<ErrorRecord> errList) {
-        reader = new StringReader(src);
+    Lexer(String src, Messager mes) {
         lines = src.split("\n");
         result = new ArrayList<>(100);
-        eList = errList;
+        messager = mes;
     }
 
     boolean scan() {
         boolean r = true;
         char c;
-        StringBuffer sbuf = new StringBuffer();
+        StringBuilder sbuf = new StringBuilder();
         for (int j = 0; j < lines.length; j++) {
             String line = lines[j];
             State state = State.S0;
@@ -64,8 +61,17 @@ class Lexer {
                             case s:
                                 result.add(new Token(Tag.SEMICOLON, j));
                                 break;
+                            case u:
+                                result.add(new Token(Tag.PLUS, j));
+                                break;
+                            case ba:
+                                result.add(new Token(Tag.BRAK_A, j));
+                                break;
+                            case bb:
+                                result.add(new Token(Tag.BRAK_B, j));
+                                break;
                             case other:
-                                eList.add(new ErrorRecord(j, i, "Unknow symbol"));
+                                messager.error(j, i, "Unknown symbol");
                                 r = false;
                                 result.add(new Token(Tag.END, j));
                                 lineLoopFlag = false;
@@ -101,8 +107,20 @@ class Lexer {
                                 result.add(new Token(Tag.SEMICOLON, j));
                                 state = State.S0;
                                 break;
+                            case ba:
+                                result.add(new Word(Tag.ID, sbuf.toString(), j));
+                                sbuf.delete(0, sbuf.length());
+                                result.add(new Token(Tag.BRAK_A, j));
+                                state = State.S0;
+                                break;
+                            case bb:
+                                result.add(new Word(Tag.ID, sbuf.toString(), j));
+                                sbuf.delete(0, sbuf.length());
+                                result.add(new Token(Tag.BRAK_B, j));
+                                state = State.S0;
+                                break;
                             case other:
-                                eList.add(new ErrorRecord(j, i, "Unknown symbol"));
+                                messager.error(j, i, "Unknown symbol");
                                 r = false;
                                 result.add(new Token(Tag.END, j));
                                 lineLoopFlag = false;
@@ -127,7 +145,7 @@ class Lexer {
                                 } else if (c == 'x') {
                                     state = State.S5;
                                 } else {
-                                    eList.add(new ErrorRecord(j, i, "Invalid identifier"));
+                                    messager.error(j, i, "Invalid identifier");
                                     r = false;
                                     result.add(new Token(Tag.END, j));
                                     state = State.S0;
@@ -149,8 +167,23 @@ class Lexer {
                                 result.add(new Token(Tag.SEMICOLON, j));
                                 state = State.S0;
                                 break;
+                            case u:
+                                result.add(new Number(0, j));
+                                result.add(new Token(Tag.PLUS, j));
+                                state = State.S0;
+                                break;
+                            case ba:
+                                result.add(new Number(0, j));
+                                result.add(new Token(Tag.BRAK_A, j));
+                                state = State.S0;
+                                break;
+                            case bb:
+                                result.add(new Number(0, j));
+                                result.add(new Token(Tag.BRAK_B, j));
+                                state = State.S0;
+                                break;
                             case other:
-                                eList.add(new ErrorRecord(j, i, "Unknown symbol"));
+                                messager.error(j, i, "Unknown symbol");
                                 r = false;
                                 result.add(new Token(Tag.END, j));
                                 lineLoopFlag = false;
@@ -169,7 +202,7 @@ class Lexer {
                                     result.add(new Number(Integer.parseInt(sbuf.toString()), j));
                                 }
                                 catch(NumberFormatException ex){
-                                    eList.add(new ErrorRecord(j, i, "Invalid number " + sbuf.toString()));
+                                    messager.error(j, i, "Invalid number " + sbuf.toString());
                                 }
                                 sbuf.delete(0, sbuf.length());
                                 result.add(new Token(Tag.END, j));
@@ -177,7 +210,7 @@ class Lexer {
                                 break;
                             case a:
                                 sbuf.append(c);
-                                eList.add(new ErrorRecord(j, i, "Invalid number " + sbuf.toString()));
+                                messager.error(j, i, "Invalid number " + sbuf.toString());
                                 r = false;
                                 result.add(new Token(Tag.END, j));
                                 lineLoopFlag = false;
@@ -197,8 +230,26 @@ class Lexer {
                                 result.add(new Token(Tag.SEMICOLON, j));
                                 state = State.S0;
                                 break;
+                            case u:
+                                result.add(new Number(Integer.parseInt(sbuf.toString()), j));
+                                sbuf.delete(0, sbuf.length());
+                                result.add(new Token(Tag.PLUS, j));
+                                state = State.S0;
+                                break;
+                            case ba:
+                                result.add(new Number(Integer.parseInt(sbuf.toString()), j));
+                                sbuf.delete(0, sbuf.length());
+                                result.add(new Token(Tag.BRAK_A, j));
+                                state = State.S0;
+                                break;
+                            case bb:
+                                result.add(new Number(Integer.parseInt(sbuf.toString()), j));
+                                sbuf.delete(0, sbuf.length());
+                                result.add(new Token(Tag.BRAK_B, j));
+                                state = State.S0;
+                                break;
                             case other:
-                                eList.add(new ErrorRecord(j, i, "Unknown symbol"));
+                                messager.error(j, i, "Unknown symbol");
                                 r = false;
                                 result.add(new Token(Tag.END, j));
                                 lineLoopFlag = false;
@@ -217,7 +268,7 @@ class Lexer {
                                     result.add(new Number(Integer.parseInt(sbuf.toString(), 2), j));
                                 }
                                 catch(NumberFormatException ex){
-                                    eList.add(new ErrorRecord(j, i, "Invalid number " + sbuf.toString()));
+                                    messager.error(j, i, "Invalid number " + sbuf.toString());
                                 }
                                 sbuf.delete(0, sbuf.length());
                                 result.add(new Token(Tag.END, j));
@@ -225,7 +276,7 @@ class Lexer {
                                 break;
                             case a:
                                 sbuf.append(c);
-                                eList.add(new ErrorRecord(j, i, "Invalid number " + sbuf.toString()));
+                                messager.error(j, i, "Invalid number " + sbuf.toString());
                                 r = false;
                                 result.add(new Token(Tag.END, j));
                                 lineLoopFlag = false;
@@ -233,7 +284,7 @@ class Lexer {
                             case d:
                                 sbuf.append(c);
                                 if (c != '0' && c != '1') {
-                                    eList.add(new ErrorRecord(j, i, "Invalid number " + sbuf.toString()));
+                                    messager.error(j, i, "Invalid number " + sbuf.toString());
                                     r = false;
                                     result.add(new Token(Tag.END, j));
                                     lineLoopFlag = false;
@@ -251,8 +302,26 @@ class Lexer {
                                 result.add(new Token(Tag.SEMICOLON, j));
                                 state = State.S0;
                                 break;
+                            case u:
+                                result.add(new Number(Integer.parseInt(sbuf.toString(), 2), j));
+                                sbuf.delete(0, sbuf.length());
+                                result.add(new Token(Tag.PLUS, j));
+                                state = State.S0;
+                                break;
+                            case ba:
+                                result.add(new Number(Integer.parseInt(sbuf.toString(), 2), j));
+                                sbuf.delete(0, sbuf.length());
+                                result.add(new Token(Tag.BRAK_A, j));
+                                state = State.S0;
+                                break;
+                            case bb:
+                                result.add(new Number(Integer.parseInt(sbuf.toString(), 2), j));
+                                sbuf.delete(0, sbuf.length());
+                                result.add(new Token(Tag.BRAK_B, j));
+                                state = State.S0;
+                                break;
                             case other:
-                                eList.add(new ErrorRecord(j, i, "Unknown symbol"));
+                                messager.error(j, i, "Unknown symbol");
                                 r = false;
                                 result.add(new Token(Tag.END, j));
                                 lineLoopFlag = false;
@@ -271,7 +340,7 @@ class Lexer {
                                     result.add(new Number(Integer.parseInt(sbuf.toString(), 16), j));
                                 }
                                 catch(NumberFormatException ex){
-                                    eList.add(new ErrorRecord(j, i, "Invalid number " + sbuf.toString()));
+                                    messager.error(j, i, "Invalid number " + sbuf.toString());
                                 }
                                 sbuf.delete(0, sbuf.length());
                                 result.add(new Token(Tag.END, j));
@@ -295,7 +364,7 @@ class Lexer {
                                         break;
                                     default:
                                         sbuf.append(c);
-                                        eList.add(new ErrorRecord(j, i, "Invalid number " + sbuf.toString()));
+                                        messager.error(j, i, "Invalid number " + sbuf.toString());
                                         r = false;
                                         result.add(new Token(Tag.END, j));
                                         lineLoopFlag = false;
@@ -316,8 +385,26 @@ class Lexer {
                                 result.add(new Token(Tag.SEMICOLON, j));
                                 state = State.S0;
                                 break;
+                            case u:
+                                result.add(new Number(Integer.parseInt(sbuf.toString(), 16), j));
+                                sbuf.delete(0, sbuf.length());
+                                result.add(new Token(Tag.PLUS, j));
+                                state = State.S0;
+                                break;
+                            case ba:
+                                result.add(new Number(Integer.parseInt(sbuf.toString(), 16), j));
+                                sbuf.delete(0, sbuf.length());
+                                result.add(new Token(Tag.BRAK_A, j));
+                                state = State.S0;
+                                break;
+                            case bb:
+                                result.add(new Number(Integer.parseInt(sbuf.toString(), 16), j));
+                                sbuf.delete(0, sbuf.length());
+                                result.add(new Token(Tag.BRAK_B, j));
+                                state = State.S0;
+                                break;
                             case other:
-                                eList.add(new ErrorRecord(j, i, "Unknown symbol"));
+                                messager.error(j, i, "Unknown symbol");
                                 r = false;
                                 result.add(new Token(Tag.END, j));
                                 lineLoopFlag = false;

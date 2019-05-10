@@ -7,11 +7,13 @@ import javafx.scene.control.Accordion;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TitledPane;
+import superbro.evm.translator.MessageRecord;
 import superbro.evm.translator.Translator;
 import superbro.evm.translator.asm.AsmTranslator;
 
 import java.net.URL;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 public class Controller implements Initializable {
 
@@ -58,10 +60,15 @@ public class Controller implements Initializable {
         Translator trans = new AsmTranslator(srcCode, srcData);
         boolean success = trans.translate();
         messageList.getItems().clear();
-        messageList.getItems().addAll(trans.getMessages());
+        messageList.getItems().addAll(
+                trans.getMessager().getErrors().stream().map(t->t.toString("Error"))
+                        .collect(Collectors.toList()));
+        messageList.getItems().addAll(
+                trans.getMessager().getWarnings().stream().map(t->t.toString("Warning"))
+                        .collect(Collectors.toList()));
         binCode.setText(trans.getListingCode());
         binData.setText(trans.getListingData());
-        if(!success){
+        if(!messageList.getItems().isEmpty()){
             messageAccordion.setExpandedPane(messagePane);
         }
     }

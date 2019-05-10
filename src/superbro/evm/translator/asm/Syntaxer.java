@@ -1,6 +1,6 @@
 package superbro.evm.translator.asm;
 
-import superbro.evm.translator.ErrorRecord;
+import superbro.evm.translator.Messager;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -9,14 +9,20 @@ import java.util.List;
 class Syntaxer {
 
     private List<Token> tokens;
-    private List<ErrorRecord> eList;
+    private Messager messager;
     private List<Instruct> result;
 
-    Syntaxer(List<Token> tokens, List<ErrorRecord> eList) {
+    Syntaxer(List<Token> tokens, Messager mes) {
         this.tokens = tokens;
-        this.eList = eList;
+        this.messager = mes;
         result = new ArrayList<>();
     }
+
+    /*boolean parse(){
+        boolean success = true;
+
+        return success;
+    }*/
 
     boolean parse() {
         boolean r = true;
@@ -44,11 +50,11 @@ class Syntaxer {
                             state = State.S1;
                             break;
                         case NUMBER:
-                            eList.add(new ErrorRecord(token.line, 0, "Unexpected number"));
+                            messager.error(token.line, 0, "Unexpected number");
                             r = false;
                             break;
                         case COMMA:
-                            eList.add(new ErrorRecord(token.line, 0, "Unexpected comma"));
+                            messager.error(token.line, 0, "Unexpected comma");
                             r = false;
                             break;
                     }
@@ -59,7 +65,7 @@ class Syntaxer {
                             try {
                                 result.add(Instruct.create(comName));
                             } catch (ParserException ex) {
-                                eList.add(new ErrorRecord(token.line, 0, ex.getMessage()));
+                                messager.error(token.line, 0, ex.getMessage());
                             }
                             state = State.S0;
                             break;
@@ -75,7 +81,7 @@ class Syntaxer {
                             state = State.S2;
                             break;
                         case COMMA:
-                            eList.add(new ErrorRecord(token.line, 0, "Unexpected comma"));
+                            messager.error(token.line, 0, "Unexpected comma");
                             r = false;
                             break;
                     }
@@ -88,16 +94,16 @@ class Syntaxer {
                                         Instruct.create(comName, arg1n) :
                                         Instruct.create(comName, arg1s));
                             } catch (ParserException ex) {
-                                eList.add(new ErrorRecord(token.line, 0, ex.getMessage()));
+                                messager.error(token.line, 0, ex.getMessage());
                             }
                             state = State.S0;
                             break;
                         case ID:
-                            eList.add(new ErrorRecord(token.line, 0, "Comma is omitted"));
+                            messager.error(token.line, 0, "Comma is omitted");
                             r = false;
                             break;
                         case NUMBER:
-                            eList.add(new ErrorRecord(token.line, 0, "Unexpected number"));
+                            messager.error(token.line, 0, "Unexpected number");
                             r = false;
                             break;
                         case COMMA:
@@ -108,7 +114,7 @@ class Syntaxer {
                 case S3:
                     switch (token.tag) {
                         case END:
-                            eList.add(new ErrorRecord(token.line, 0, "Unexpected end of instruction"));
+                            messager.error(token.line, 0, "Unexpected end of instruction");
                             r = false;
                             break;
                         case ID:
@@ -123,7 +129,7 @@ class Syntaxer {
                             state = State.S4;
                             break;
                         case COMMA:
-                            eList.add(new ErrorRecord(token.line, 0, "Unexpected comma"));
+                            messager.error(token.line, 0, "Unexpected comma");
                             r = false;
                             break;
                     }
@@ -142,20 +148,20 @@ class Syntaxer {
                                             Instruct.create(comName, arg1s, arg2s));
                                 }
                             } catch (ParserException ex) {
-                                eList.add(new ErrorRecord(token.line, 0, ex.getMessage()));
+                                messager.error(token.line, 0, ex.getMessage());
                             }
                             state = State.S0;
                             break;
                         case ID:
-                            eList.add(new ErrorRecord(token.line, 0, "Unexpected identifier"));
+                            messager.error(token.line, 0, "Unexpected identifier");
                             r = false;
                             break;
                         case NUMBER:
-                            eList.add(new ErrorRecord(token.line, 0, "Unexpected number"));
+                            messager.error(token.line, 0, "Unexpected number");
                             r = false;
                             break;
                         case COMMA:
-                            eList.add(new ErrorRecord(token.line, 0, "Unexpected comma"));
+                            messager.error(token.line, 0, "Unexpected comma");
                             r = false;
                             break;
                     }
