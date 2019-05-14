@@ -12,50 +12,116 @@ class Syntaxer {
     private Messager messager;
     private List<Instruct> result;
 
+    private Iterator<Token> toks;
+    private ArrayList<Label> unresolvedLabels;
+    private Word tLabel, tCommand;
+    private Token arg1, arg2;
+    private ComplexArg carg;
+    private int curArg;
+
     Syntaxer(List<Token> tokens, Messager mes) {
         this.tokens = tokens;
+        toks = tokens.iterator();
         this.messager = mes;
         result = new ArrayList<>();
+        unresolvedLabels = new ArrayList<>(2);
     }
 
-    /*boolean parse(){
-        boolean success = true;
+    /*private boolean match(Tag m) {
+        if (look.tag == m) {
+            look = toks.next();
+            return true;
+        }
+        return false;
+    }
 
+    boolean parse() {
+        boolean success = true;
+        if (!toks.hasNext()) {
+            return true;
+        }
+        Instruct instruct;
+        do {
+            instruct = instr();
+            if (instruct != null) {
+                result.add(instruct);
+            }
+        }
+        while (instruct != null);
         return success;
+    }
+
+    private Instruct instr() {
+        if (!toks.hasNext()) {
+            return null;
+        }
+        Instruct r;
+        if (look.tag != Tag.ID) {
+            messager.error(look.line, 0, "Unexpected token");
+            return null;
+        }
+        Token id1 = look;
+        Word tLabel, tCom;
+        match(Tag.ID);
+        switch (look.tag) {
+            case COLON:
+                match(Tag.COLON);
+                tLabel = (Word) id1;
+                break;
+            case BRAK_A:
+                tCom = (Word) id1;
+                parseComplexArg();
+                break;
+            case ID:
+                break;
+            case NUMBER:
+                break;
+            default:
+                messager.error(look.line, 0, "Unexpected token");
+                return null;
+
+        }
+
+        return r;
+    }
+
+    private void parseComplexArg() {
+
     }*/
 
     boolean parse() {
         boolean r = true;
-        Iterator<Token> iter = tokens.iterator();
         State state = State.S0;
-        String comName = null, arg1s = null, arg2s = null;
-        int arg1n = 0, arg2n = 0;
-        boolean arg1N = false, arg2N = false;
-        while (iter.hasNext()) {
-            Token token = iter.next();
+        while (toks.hasNext()) {
+            Token token = toks.next();
             switch (state) {
                 case S0:
-                    arg1N = false;
-                    arg2N = false;
-                    comName = null;
-                    arg1s = null;
-                    arg2s = null;
-                    arg1n = 0;
-                    arg2n = 0;
+                    tLabel = null;
+                    tCommand = null;
+                    arg1 = null;
+                    arg2 = null;
+                    carg = null;
+                    curArg = 1;
                     switch (token.tag) {
                         case END:
                             break;
                         case ID:
-                            comName = ((Word) token).lexeme;
+                            tCommand = ((Word) token);
                             state = State.S1;
                             break;
                         case NUMBER:
-                            messager.error(token.line, 0, "Unexpected number");
+                            messager.error(token.line, token.col, "Unexpected number");
                             r = false;
+                            state = State.S0;
                             break;
                         case COMMA:
-                            messager.error(token.line, 0, "Unexpected comma");
+                        case COLON:
+                        case BRAK_A:
+                        case BRAK_B:
+                        case PLUS:
+                            messager.error(token.line, token.col, "Unexpected symbol");
                             r = false;
+                            state = State.S0;
                             break;
                     }
                     break;
@@ -63,106 +129,285 @@ class Syntaxer {
                     switch (token.tag) {
                         case END:
                             try {
-                                result.add(Instruct.create(comName));
+                                createInstruction();
                             } catch (ParserException ex) {
-                                messager.error(token.line, 0, ex.getMessage());
+                                messager.error(token.line, token.col, ex.getMessage());
                             }
                             state = State.S0;
                             break;
-                        case ID:
-                            arg1s = ((Word) token).lexeme;
-                            arg1N = false;
+                        case COLON:
+                            tLabel = tCommand;
                             state = State.S2;
                             break;
+                        case ID:
                         case NUMBER:
-                            arg1s = null;
-                            arg1n = ((Number) token).value;
-                            arg1N = true;
-                            state = State.S2;
+                            arg1 = token;
+                            state = State.S3;
+                            break;
+                        case BRAK_A:
+                            state = State.S4;
                             break;
                         case COMMA:
-                            messager.error(token.line, 0, "Unexpected comma");
+                        case BRAK_B:
+                        case PLUS:
+                            messager.error(token.line, token.col, "Unexpected symbol");
                             r = false;
+                            state = State.S0;
                             break;
                     }
                     break;
                 case S2:
                     switch (token.tag) {
                         case END:
-                            try {
-                                result.add(arg1N ?
-                                        Instruct.create(comName, arg1n) :
-                                        Instruct.create(comName, arg1s));
-                            } catch (ParserException ex) {
-                                messager.error(token.line, 0, ex.getMessage());
-                            }
+                            unresolvedLabels.add(new Label(tLabel));
                             state = State.S0;
                             break;
                         case ID:
-                            messager.error(token.line, 0, "Comma is omitted");
-                            r = false;
+                            tCommand = (Word) token;
+                            state = State.S5;
                             break;
                         case NUMBER:
-                            messager.error(token.line, 0, "Unexpected number");
+                            messager.error(token.line, token.col, "Unexpected number");
                             r = false;
+                            state = State.S0;
                             break;
                         case COMMA:
-                            state = State.S3;
+                        case BRAK_A:
+                        case BRAK_B:
+                        case PLUS:
+                            messager.error(token.line, token.col, "Unexpected symbol");
+                            r = false;
+                            state = State.S0;
                             break;
                     }
                     break;
                 case S3:
                     switch (token.tag) {
                         case END:
-                            messager.error(token.line, 0, "Unexpected end of instruction");
-                            r = false;
+                            try {
+                                createInstruction();
+                            } catch (ParserException ex) {
+                                messager.error(token.line, token.col, ex.getMessage());
+                            }
+                            state = State.S0;
                             break;
                         case ID:
-                            arg2s = ((Word) token).lexeme;
-                            arg2N = false;
-                            state = State.S4;
-                            break;
                         case NUMBER:
-                            arg2s = null;
-                            arg2n = ((Number) token).value;
-                            arg2N = true;
-                            state = State.S4;
+                            messager.error(token.line, token.col, "Missed comma");
+                            r = false;
+                            state = State.S0;
                             break;
                         case COMMA:
-                            messager.error(token.line, 0, "Unexpected comma");
+                            curArg++;
+                            state = State.S6;
+                            break;
+                        case BRAK_A:
+                        case BRAK_B:
+                        case PLUS:
+                            messager.error(token.line, token.col, "Unexpected symbol");
                             r = false;
+                            state = State.S0;
                             break;
                     }
                     break;
                 case S4:
                     switch (token.tag) {
                         case END:
+                            messager.error(token.line, token.col, "Unexpected end of command");
+                            r = false;
+                            state = State.S0;
+                            break;
+                        case ID:
+                        case NUMBER:
+                            carg = new ComplexArg(token);
+                            arg1 = carg;
+                            state = State.S8;
+                            break;
+                        case BRAK_B:
+                            messager.error(token.line, token.col, "Missed argument");
+                            r = false;
+                            state = State.S0;
+                            break;
+                        case BRAK_A:
+                        case COMMA:
+                        case COLON:
+                        case PLUS:
+                            messager.error(token.line, token.col, "Unexpected symbol");
+                            r = false;
+                            state = State.S0;
+                            break;
+                    }
+                    break;
+                case S5:
+                    switch (token.tag) {
+                        case END:
                             try {
-                                if (arg1N) {
-                                    result.add(arg2N ?
-                                            Instruct.create(comName, arg1n, arg2n) :
-                                            Instruct.create(comName, arg1n, arg2s));
-                                } else {
-                                    result.add(arg2N ?
-                                            Instruct.create(comName, arg1s, arg2n) :
-                                            Instruct.create(comName, arg1s, arg2s));
-                                }
+                                createInstruction();
                             } catch (ParserException ex) {
-                                messager.error(token.line, 0, ex.getMessage());
+                                messager.error(token.line, token.col, ex.getMessage());
                             }
                             state = State.S0;
                             break;
                         case ID:
-                            messager.error(token.line, 0, "Unexpected identifier");
-                            r = false;
-                            break;
                         case NUMBER:
-                            messager.error(token.line, 0, "Unexpected number");
-                            r = false;
+                            arg1 = token;
+                            state = State.S3;
                             break;
+                        case BRAK_A:
+                            state = State.S4;
+                            break;
+                        case BRAK_B:
                         case COMMA:
-                            messager.error(token.line, 0, "Unexpected comma");
+                        case COLON:
+                        case PLUS:
+                            messager.error(token.line, token.col, "Unexpected symbol");
                             r = false;
+                            state = State.S0;
+                            break;
+                    }
+                    break;
+                case S6:
+                    switch (token.tag) {
+                        case END:
+                            messager.error(token.line, token.col, "Unexpected end of command");
+                            r = false;
+                            state = State.S0;
+                            break;
+                        case ID:
+                        case NUMBER:
+                            arg2 = token;
+                            state = State.S7;
+                            break;
+                        case BRAK_A:
+                            state = State.S4;
+                            break;
+                        case BRAK_B:
+                        case COMMA:
+                        case COLON:
+                        case PLUS:
+                            messager.error(token.line, token.col, "Unexpected symbol");
+                            r = false;
+                            state = State.S0;
+                            break;
+                    }
+                    break;
+                case S7:
+                    switch (token.tag) {
+                        case END:
+                            try {
+                                createInstruction();
+                            } catch (ParserException ex) {
+                                messager.error(token.line, token.col, ex.getMessage());
+                            }
+                            state = State.S0;
+                            break;
+                        case ID:
+                        case NUMBER:
+                        case BRAK_A:
+                        case BRAK_B:
+                        case COMMA:
+                        case COLON:
+                        case PLUS:
+                            messager.error(token.line, token.col, "Unexpected symbol");
+                            r = false;
+                            state = State.S0;
+                            break;
+                    }
+                    break;
+                case S8:
+                    switch (token.tag) {
+                        case END:
+                            messager.error(token.line, token.col, "Unexpected end of command");
+                            r = false;
+                            state = State.S0;
+                            break;
+                        case BRAK_B:
+                            switch (curArg){
+                                case 1:
+                                    arg1 = carg;
+                                    state = State.S3;
+                                    break;
+                                case 2:
+                                    arg2 = carg;
+                                    state = State.S7;
+                                    break;
+                            }
+                            break;
+                        case PLUS:
+                            state = State.S9;
+                            break;
+                        case ID:
+                        case NUMBER:
+                            messager.error(token.line, token.col, "Missed plus sign");
+                            r = false;
+                            state = State.S0;
+                            break;
+                        case BRAK_A:
+                        case COMMA:
+                        case COLON:
+                            messager.error(token.line, token.col, "Unexpected symbol");
+                            r = false;
+                            state = State.S0;
+                            break;
+                    }
+                    break;
+                case S9:
+                    switch (token.tag) {
+                        case END:
+                            messager.error(token.line, token.col, "Unexpected end of command");
+                            r = false;
+                            state = State.S0;
+                            break;
+                        case PLUS:
+                            state = State.S9;
+                            break;
+                        case ID:
+                        case NUMBER:
+                            carg.plus(token);
+                            state = State.S10;
+                            break;
+                        case BRAK_A:
+                        case BRAK_B:
+                        case COMMA:
+                        case COLON:
+                            messager.error(token.line, token.col, "Unexpected symbol");
+                            r = false;
+                            state = State.S0;
+                            break;
+                    }
+                    break;
+                case S10:
+                    switch (token.tag) {
+                        case END:
+                            messager.error(token.line, token.col, "Unexpected end of command");
+                            r = false;
+                            state = State.S0;
+                            break;
+                        case ID:
+                        case NUMBER:
+                            messager.error(token.line, token.col, "Unexpected argument");
+                            r = false;
+                            state = State.S0;
+                            break;
+                        case BRAK_B:
+                            switch (curArg){
+                                case 1:
+                                    arg1 = carg;
+                                    state = State.S3;
+                                    break;
+                                case 2:
+                                    arg2 = carg;
+                                    state = State.S7;
+                                    break;
+                            }
+                            break;
+                        case BRAK_A:
+                        case PLUS:
+                        case COMMA:
+                        case COLON:
+                            messager.error(token.line, token.col, "Unexpected symbol");
+                            r = false;
+                            state = State.S0;
                             break;
                     }
                     break;
@@ -171,11 +416,19 @@ class Syntaxer {
         return r;
     }
 
+    private void createInstruction() throws ParserException {
+        Instruct instruction = Instruct.create(
+                unresolvedLabels, tCommand, arg1, arg2);
+        unresolvedLabels.clear();
+        result.add(instruction);
+    }
+
     List<Instruct> getResult() {
         return result;
     }
 
     private enum State {
-        S0, S1, S2, S3, S4
+        S0, S1, S2, S3, S4, S5, S6, S7,
+        S8, S9, S10, S11, S12, S13, S14
     }
 }

@@ -4,8 +4,8 @@ class Number extends Token {
 
     final int value;
 
-    Number(int v, int n){
-        super(Tag.NUMBER, n);
+    Number(int v, int n, int c){
+        super(Tag.NUMBER, n, c);
         value = v;
     }
 }

@@ -40,7 +40,7 @@ class Lexer {
                             case p:
                                 break;
                             case n:
-                                result.add(new Token(Tag.END, j));
+                                result.add(new Token(Tag.END, j, i));
                                 lineLoopFlag = false;
                                 break;
                             case a:
@@ -56,24 +56,24 @@ class Lexer {
                                 }
                                 break;
                             case m:
-                                result.add(new Token(Tag.COMMA, j));
+                                result.add(new Token(Tag.COMMA, j, i));
                                 break;
                             case s:
-                                result.add(new Token(Tag.SEMICOLON, j));
+                                result.add(new Token(Tag.COLON, j, i));
                                 break;
                             case u:
-                                result.add(new Token(Tag.PLUS, j));
+                                result.add(new Token(Tag.PLUS, j, i));
                                 break;
                             case ba:
-                                result.add(new Token(Tag.BRAK_A, j));
+                                result.add(new Token(Tag.BRAK_A, j, i));
                                 break;
                             case bb:
-                                result.add(new Token(Tag.BRAK_B, j));
+                                result.add(new Token(Tag.BRAK_B, j, i));
                                 break;
                             case other:
                                 messager.error(j, i, "Unknown symbol");
                                 r = false;
-                                result.add(new Token(Tag.END, j));
+                                result.add(new Token(Tag.END, j, i));
                                 lineLoopFlag = false;
                                 break;
                         }
@@ -81,14 +81,14 @@ class Lexer {
                     case S1:
                         switch (charCat) {
                             case p:
-                                result.add(new Word(Tag.ID, sbuf.toString(), j));
+                                result.add(new Word(Tag.ID, sbuf.toString(), j, i));
                                 sbuf.delete(0, sbuf.length());
                                 state = State.S0;
                                 break;
                             case n:
-                                result.add(new Word(Tag.ID, sbuf.toString(), j));
+                                result.add(new Word(Tag.ID, sbuf.toString(), j, i));
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.END, j));
+                                result.add(new Token(Tag.END, j, i));
                                 lineLoopFlag = false;
                                 break;
                             case a:
@@ -96,33 +96,33 @@ class Lexer {
                                 sbuf.append(c);
                                 break;
                             case m:
-                                result.add(new Word(Tag.ID, sbuf.toString(), j));
+                                result.add(new Word(Tag.ID, sbuf.toString(), j, i));
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.COMMA, j));
+                                result.add(new Token(Tag.COMMA, j, i));
                                 state = State.S0;
                                 break;
                             case s:
-                                result.add(new Word(Tag.ID, sbuf.toString(), j));
+                                result.add(new Word(Tag.ID, sbuf.toString(), j, i));
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.SEMICOLON, j));
+                                result.add(new Token(Tag.COLON, j, i));
                                 state = State.S0;
                                 break;
                             case ba:
-                                result.add(new Word(Tag.ID, sbuf.toString(), j));
+                                result.add(new Word(Tag.ID, sbuf.toString(), j, i));
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.BRAK_A, j));
+                                result.add(new Token(Tag.BRAK_A, j, i));
                                 state = State.S0;
                                 break;
                             case bb:
-                                result.add(new Word(Tag.ID, sbuf.toString(), j));
+                                result.add(new Word(Tag.ID, sbuf.toString(), j, i));
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.BRAK_B, j));
+                                result.add(new Token(Tag.BRAK_B, j, i));
                                 state = State.S0;
                                 break;
                             case other:
                                 messager.error(j, i, "Unknown symbol");
                                 r = false;
-                                result.add(new Token(Tag.END, j));
+                                result.add(new Token(Tag.END, j, i));
                                 lineLoopFlag = false;
                                 break;
                         }
@@ -130,12 +130,12 @@ class Lexer {
                     case S2:
                         switch (charCat) {
                             case p:
-                                result.add(new Number(0, j));
+                                result.add(new Number(0, j, i));
                                 state = State.S0;
                                 break;
                             case n:
-                                result.add(new Number(0, j));
-                                result.add(new Token(Tag.END, j));
+                                result.add(new Number(0, j, i));
+                                result.add(new Token(Tag.END, j, i));
                                 state = State.S0;
                                 lineLoopFlag = false;
                                 break;
@@ -147,7 +147,7 @@ class Lexer {
                                 } else {
                                     messager.error(j, i, "Invalid identifier");
                                     r = false;
-                                    result.add(new Token(Tag.END, j));
+                                    result.add(new Token(Tag.END, j, i));
                                     state = State.S0;
                                     lineLoopFlag = false;
                                     break;
@@ -158,34 +158,34 @@ class Lexer {
                                 state = State.S3;
                                 break;
                             case m:
-                                result.add(new Number(0, j));
-                                result.add(new Token(Tag.COMMA, j));
+                                result.add(new Number(0, j, i));
+                                result.add(new Token(Tag.COMMA, j, i));
                                 state = State.S0;
                                 break;
                             case s:
-                                result.add(new Number(0, j));
-                                result.add(new Token(Tag.SEMICOLON, j));
+                                result.add(new Number(0, j, i));
+                                result.add(new Token(Tag.COLON, j, i));
                                 state = State.S0;
                                 break;
                             case u:
-                                result.add(new Number(0, j));
-                                result.add(new Token(Tag.PLUS, j));
+                                result.add(new Number(0, j, i));
+                                result.add(new Token(Tag.PLUS, j, i));
                                 state = State.S0;
                                 break;
                             case ba:
-                                result.add(new Number(0, j));
-                                result.add(new Token(Tag.BRAK_A, j));
+                                result.add(new Number(0, j, i));
+                                result.add(new Token(Tag.BRAK_A, j, i));
                                 state = State.S0;
                                 break;
                             case bb:
-                                result.add(new Number(0, j));
-                                result.add(new Token(Tag.BRAK_B, j));
+                                result.add(new Number(0, j, i));
+                                result.add(new Token(Tag.BRAK_B, j, i));
                                 state = State.S0;
                                 break;
                             case other:
                                 messager.error(j, i, "Unknown symbol");
                                 r = false;
-                                result.add(new Token(Tag.END, j));
+                                result.add(new Token(Tag.END, j, i));
                                 lineLoopFlag = false;
                                 break;
                         }
@@ -193,65 +193,65 @@ class Lexer {
                     case S3:
                         switch (charCat) {
                             case p:
-                                result.add(new Number(Integer.parseInt(sbuf.toString()), j));
+                                result.add(new Number(Integer.parseInt(sbuf.toString()), j, i));
                                 sbuf.delete(0, sbuf.length());
                                 state = State.S0;
                                 break;
                             case n:
                                 try{
-                                    result.add(new Number(Integer.parseInt(sbuf.toString()), j));
+                                    result.add(new Number(Integer.parseInt(sbuf.toString()), j, i));
                                 }
                                 catch(NumberFormatException ex){
                                     messager.error(j, i, "Invalid number " + sbuf.toString());
                                 }
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.END, j));
+                                result.add(new Token(Tag.END, j, i));
                                 lineLoopFlag = false;
                                 break;
                             case a:
                                 sbuf.append(c);
                                 messager.error(j, i, "Invalid number " + sbuf.toString());
                                 r = false;
-                                result.add(new Token(Tag.END, j));
+                                result.add(new Token(Tag.END, j, i));
                                 lineLoopFlag = false;
                                 break;
                             case d:
                                 sbuf.append(c);
                                 break;
                             case m:
-                                result.add(new Number(Integer.parseInt(sbuf.toString()), j));
+                                result.add(new Number(Integer.parseInt(sbuf.toString()), j, i));
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.COMMA, j));
+                                result.add(new Token(Tag.COMMA, j, i));
                                 state = State.S0;
                                 break;
                             case s:
-                                result.add(new Number(Integer.parseInt(sbuf.toString()), j));
+                                result.add(new Number(Integer.parseInt(sbuf.toString()), j, i));
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.SEMICOLON, j));
+                                result.add(new Token(Tag.COLON, j, i));
                                 state = State.S0;
                                 break;
                             case u:
-                                result.add(new Number(Integer.parseInt(sbuf.toString()), j));
+                                result.add(new Number(Integer.parseInt(sbuf.toString()), j, i));
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.PLUS, j));
+                                result.add(new Token(Tag.PLUS, j, i));
                                 state = State.S0;
                                 break;
                             case ba:
-                                result.add(new Number(Integer.parseInt(sbuf.toString()), j));
+                                result.add(new Number(Integer.parseInt(sbuf.toString()), j, i));
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.BRAK_A, j));
+                                result.add(new Token(Tag.BRAK_A, j, i));
                                 state = State.S0;
                                 break;
                             case bb:
-                                result.add(new Number(Integer.parseInt(sbuf.toString()), j));
+                                result.add(new Number(Integer.parseInt(sbuf.toString()), j, i));
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.BRAK_B, j));
+                                result.add(new Token(Tag.BRAK_B, j, i));
                                 state = State.S0;
                                 break;
                             case other:
                                 messager.error(j, i, "Unknown symbol");
                                 r = false;
-                                result.add(new Token(Tag.END, j));
+                                result.add(new Token(Tag.END, j, i));
                                 lineLoopFlag = false;
                                 break;
                         }
@@ -259,26 +259,26 @@ class Lexer {
                     case S4:
                         switch (charCat) {
                             case p:
-                                result.add(new Number(Integer.parseInt(sbuf.toString(), 2), j));
+                                result.add(new Number(Integer.parseInt(sbuf.toString(), 2), j, i));
                                 sbuf.delete(0, sbuf.length());
                                 state = State.S0;
                                 break;
                             case n:
                                 try{
-                                    result.add(new Number(Integer.parseInt(sbuf.toString(), 2), j));
+                                    result.add(new Number(Integer.parseInt(sbuf.toString(), 2), j, i));
                                 }
                                 catch(NumberFormatException ex){
                                     messager.error(j, i, "Invalid number " + sbuf.toString());
                                 }
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.END, j));
+                                result.add(new Token(Tag.END, j, i));
                                 lineLoopFlag = false;
                                 break;
                             case a:
                                 sbuf.append(c);
                                 messager.error(j, i, "Invalid number " + sbuf.toString());
                                 r = false;
-                                result.add(new Token(Tag.END, j));
+                                result.add(new Token(Tag.END, j, i));
                                 lineLoopFlag = false;
                                 break;
                             case d:
@@ -286,44 +286,44 @@ class Lexer {
                                 if (c != '0' && c != '1') {
                                     messager.error(j, i, "Invalid number " + sbuf.toString());
                                     r = false;
-                                    result.add(new Token(Tag.END, j));
+                                    result.add(new Token(Tag.END, j, i));
                                     lineLoopFlag = false;
                                 }
                                 break;
                             case m:
-                                result.add(new Number(Integer.parseInt(sbuf.toString(), 2), j));
+                                result.add(new Number(Integer.parseInt(sbuf.toString(), 2), j, i));
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.COMMA, j));
+                                result.add(new Token(Tag.COMMA, j, i));
                                 state = State.S0;
                                 break;
                             case s:
-                                result.add(new Number(Integer.parseInt(sbuf.toString(), 2), j));
+                                result.add(new Number(Integer.parseInt(sbuf.toString(), 2), j, i));
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.SEMICOLON, j));
+                                result.add(new Token(Tag.COLON, j, i));
                                 state = State.S0;
                                 break;
                             case u:
-                                result.add(new Number(Integer.parseInt(sbuf.toString(), 2), j));
+                                result.add(new Number(Integer.parseInt(sbuf.toString(), 2), j, i));
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.PLUS, j));
+                                result.add(new Token(Tag.PLUS, j, i));
                                 state = State.S0;
                                 break;
                             case ba:
-                                result.add(new Number(Integer.parseInt(sbuf.toString(), 2), j));
+                                result.add(new Number(Integer.parseInt(sbuf.toString(), 2), j, i));
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.BRAK_A, j));
+                                result.add(new Token(Tag.BRAK_A, j, i));
                                 state = State.S0;
                                 break;
                             case bb:
-                                result.add(new Number(Integer.parseInt(sbuf.toString(), 2), j));
+                                result.add(new Number(Integer.parseInt(sbuf.toString(), 2), j, i));
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.BRAK_B, j));
+                                result.add(new Token(Tag.BRAK_B, j, i));
                                 state = State.S0;
                                 break;
                             case other:
                                 messager.error(j, i, "Unknown symbol");
                                 r = false;
-                                result.add(new Token(Tag.END, j));
+                                result.add(new Token(Tag.END, j, i));
                                 lineLoopFlag = false;
                                 break;
                         }
@@ -331,19 +331,19 @@ class Lexer {
                     case S5:
                         switch (charCat) {
                             case p:
-                                result.add(new Number(Integer.parseInt(sbuf.toString(), 16), j));
+                                result.add(new Number(Integer.parseInt(sbuf.toString(), 16), j, i));
                                 sbuf.delete(0, sbuf.length());
                                 state = State.S0;
                                 break;
                             case n:
                                 try{
-                                    result.add(new Number(Integer.parseInt(sbuf.toString(), 16), j));
+                                    result.add(new Number(Integer.parseInt(sbuf.toString(), 16), j, i));
                                 }
                                 catch(NumberFormatException ex){
                                     messager.error(j, i, "Invalid number " + sbuf.toString());
                                 }
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.END, j));
+                                result.add(new Token(Tag.END, j, i));
                                 lineLoopFlag = false;
                                 break;
                             case a:
@@ -366,7 +366,7 @@ class Lexer {
                                         sbuf.append(c);
                                         messager.error(j, i, "Invalid number " + sbuf.toString());
                                         r = false;
-                                        result.add(new Token(Tag.END, j));
+                                        result.add(new Token(Tag.END, j, i));
                                         lineLoopFlag = false;
                                 }
                                 break;
@@ -374,39 +374,39 @@ class Lexer {
                                 sbuf.append(c);
                                 break;
                             case m:
-                                result.add(new Number(Integer.parseInt(sbuf.toString(), 16), j));
+                                result.add(new Number(Integer.parseInt(sbuf.toString(), 16), j, i));
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.COMMA, j));
+                                result.add(new Token(Tag.COMMA, j, i));
                                 state = State.S0;
                                 break;
                             case s:
-                                result.add(new Number(Integer.parseInt(sbuf.toString(), 16), j));
+                                result.add(new Number(Integer.parseInt(sbuf.toString(), 16), j, i));
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.SEMICOLON, j));
+                                result.add(new Token(Tag.COLON, j, i));
                                 state = State.S0;
                                 break;
                             case u:
-                                result.add(new Number(Integer.parseInt(sbuf.toString(), 16), j));
+                                result.add(new Number(Integer.parseInt(sbuf.toString(), 16), j, i));
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.PLUS, j));
+                                result.add(new Token(Tag.PLUS, j, i));
                                 state = State.S0;
                                 break;
                             case ba:
-                                result.add(new Number(Integer.parseInt(sbuf.toString(), 16), j));
+                                result.add(new Number(Integer.parseInt(sbuf.toString(), 16), j, i));
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.BRAK_A, j));
+                                result.add(new Token(Tag.BRAK_A, j, i));
                                 state = State.S0;
                                 break;
                             case bb:
-                                result.add(new Number(Integer.parseInt(sbuf.toString(), 16), j));
+                                result.add(new Number(Integer.parseInt(sbuf.toString(), 16), j, i));
                                 sbuf.delete(0, sbuf.length());
-                                result.add(new Token(Tag.BRAK_B, j));
+                                result.add(new Token(Tag.BRAK_B, j, i));
                                 state = State.S0;
                                 break;
                             case other:
                                 messager.error(j, i, "Unknown symbol");
                                 r = false;
-                                result.add(new Token(Tag.END, j));
+                                result.add(new Token(Tag.END, j, i));
                                 lineLoopFlag = false;
                                 break;
                         }

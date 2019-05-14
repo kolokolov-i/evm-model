@@ -4,6 +4,7 @@ import superbro.evm.translator.asm.cmd.*;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 class Instruct {
 
@@ -96,6 +97,10 @@ class Instruct {
             throw new ParserException("Unknown command \'" + name + "\'");
         }
         this.command = commandMap.get(cname);
+    }
+
+    public static Instruct create(List<Label> labels, Word command, Token arg1, Token arg2) {
+        return null;
     }
 
     void generate(ArrayList<Short> r) throws ParserException {

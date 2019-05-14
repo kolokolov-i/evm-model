@@ -4,8 +4,8 @@ class Word extends Token {
 
     final String lexeme;
 
-    Word(Tag tag, String s, int n) {
-        super(tag, n);
+    Word(Tag tag, String s, int n, int c) {
+        super(tag, n, c);
         lexeme = s;
     }
 }
