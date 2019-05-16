@@ -16,11 +16,11 @@ public class Main extends Application {
             throw ex;
         }
         primaryStage.show();
-        GUI.hideSplash();
+        GUI.splashHide();
     }
 
     public static void main(String[] args) {
-        GUI.showSplash();
+        GUI.splashShow();
         Config.load();
         launch(args);
     }
