@@ -16,12 +16,23 @@ public class MachineManager {
     static List<MachineItem> machines = new ArrayList<>();
 
     static void scanMachines() {
-
+        for (MachineItem m : machines) {
+            Path path = Config.machinesDirectory.resolve(m.name);
+            if (Files.exists(path)) {
+                try {
+                    m.instance = Machine.loadFrom(path);
+                    m.status = Status.IDLE;
+                } catch (IOException e) {
+                    m.instance = null;
+                    m.status = Status.ERROR;
+                }
+            }
+        }
     }
 
     public static void createMachine(String name) {
         Optional<MachineItem> item = machines.stream().filter(m -> m.name.equals(name.toUpperCase())).findAny();
-        if(item.isPresent()){
+        if (item.isPresent()) {
             JOptionPane.showMessageDialog(null, "Machine is already exist", "Can't create machine", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
@@ -30,8 +41,7 @@ public class MachineManager {
             Path path = Config.machinesDirectory.resolve(machine.name);
             if (Files.exists(path)) {
                 JOptionPane.showMessageDialog(null, "Machine is already exist", "Machine added", JOptionPane.INFORMATION_MESSAGE);
-            }
-            else{
+            } else {
                 Files.createDirectory(path);
             }
             machines.add(machine);
@@ -47,13 +57,19 @@ public class MachineManager {
     }
 
     public static class MachineItem {
+
         public String name;
         public String title;
-        public Machine instance;
+        transient public Machine instance;
+        transient public Status status;
 
         public MachineItem(String title) {
             this.title = title;
             this.name = title.toUpperCase();
         }
+    }
+
+    public enum Status {
+        IDLE, RUN, PAUSE, ERROR
     }
 }

@@ -10,6 +10,7 @@ public class DialogCreateMachine extends JDialog {
     private JPanel contentPane;
     private JButton buttonOK;
     private JButton buttonCancel;
+    private JLabel lbl1;
     private JTextField textFieldName;
 
     DialogCreateMachine() {

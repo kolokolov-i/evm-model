@@ -1,5 +1,15 @@
 package superbro.evm.core;
 
-public class Device {
+import javax.swing.*;
 
+public abstract class Device {
+
+    public abstract void launch();
+
+    public abstract JPanel getOptionsPane();
+
+    public abstract static class DeviceBuilder {
+
+        public abstract Device create();
+    }
 }

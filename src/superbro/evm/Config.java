@@ -16,24 +16,25 @@ import java.util.List;
 
 public class Config {
 
+    static Main mainConfig;
+
     static Path
             directory = Paths.get(System.getProperty("user.dir")),
-            mainConfig = directory.resolve("evm.conf.json"),
+            mainConfigPath = directory.resolve("evm.conf.json"),
             machinesConfig = directory.resolve("machines.json"),
             machinesDirectory = directory.resolve("machines");
     private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     public static void load() {
-        try{
-            if (Files.exists(mainConfig)) {
+        try {
+            if (Files.exists(mainConfigPath)) {
                 loadMainConfig();
             } else {
                 createMainConfig();
             }
             loadMachinesConfig();
             MachineManager.scanMachines();
-        }
-        catch(IOException e){
+        } catch (IOException e) {
             e.printStackTrace(System.err);
             System.exit(0);
         }
@@ -50,20 +51,35 @@ public class Config {
 
     private static void loadMachinesConfig() throws IOException {
         BufferedReader reader = Files.newBufferedReader(machinesConfig);
-        Type type = new TypeToken<List<MachineManager.MachineItem>>(){}.getType();
+        Type type = new TypeToken<List<MachineManager.MachineItem>>() {
+        }.getType();
         MachineManager.machines = gson.fromJson(reader, type);
         reader.close();
     }
 
     private static void createMainConfig() throws IOException {
-        BufferedWriter writer = Files.newBufferedWriter(mainConfig, StandardOpenOption.CREATE);
-        gson.toJson("EVM1", writer);
+        BufferedWriter writer = Files.newBufferedWriter(mainConfigPath, StandardOpenOption.CREATE);
+        gson.toJson(new Main(), writer);
         writer.close();
     }
 
     private static void loadMainConfig() throws IOException {
-        BufferedReader reader = Files.newBufferedReader(mainConfig);
-        String sign = gson.fromJson(reader, String.class);
+        BufferedReader reader = Files.newBufferedReader(mainConfigPath);
+        mainConfig = gson.fromJson(reader, Main.class);
         reader.close();
+        if (mainConfig == null) {
+            createMainConfig();
+        }
+    }
+
+    static class Main {
+
+        String version;
+        String language;
+
+        public Main() {
+            version = "1.0";
+            language = "eng";
+        }
     }
 }
