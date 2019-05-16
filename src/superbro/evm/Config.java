@@ -16,7 +16,7 @@ import java.util.List;
 
 public class Config {
 
-    public static Path
+    static Path
             directory = Paths.get(System.getProperty("user.dir")),
             mainConfig = directory.resolve("evm.conf.json"),
             machinesConfig = directory.resolve("machines.json"),
@@ -30,17 +30,22 @@ public class Config {
             } else {
                 createMainConfig();
             }
-            if(Files.exists(machinesConfig)){
-                loadMachinesConfig();
-            }
-            else{
-                createMachinesConfig();
-            }
+            loadMachinesConfig();
+            MachineManager.scanMachines();
         }
         catch(IOException e){
             e.printStackTrace(System.err);
             System.exit(0);
         }
+    }
+
+    static void saveMachinesConfig() throws IOException {
+        BufferedWriter writer = Files.newBufferedWriter(machinesConfig, StandardOpenOption.CREATE);
+        gson.toJson(MachineManager.machines, writer);
+        writer.close();
+        /*for(MachineManager.MachineItem m : MachineManager.machines){
+            Files.createDirectory(machinesDirectory.resolve(m.name));
+        }*/
     }
 
     private static void loadMachinesConfig() throws IOException {
@@ -50,10 +55,9 @@ public class Config {
         reader.close();
     }
 
-    private static void createMachinesConfig() throws IOException {
-        BufferedWriter writer = Files.newBufferedWriter(machinesConfig, StandardOpenOption.CREATE);
-        gson.toJson(MachineManager.machines, writer);
-        Files.createDirectory(machinesDirectory);
+    private static void createMainConfig() throws IOException {
+        BufferedWriter writer = Files.newBufferedWriter(mainConfig, StandardOpenOption.CREATE);
+        gson.toJson("EVM1", writer);
         writer.close();
     }
 
@@ -61,17 +65,5 @@ public class Config {
         BufferedReader reader = Files.newBufferedReader(mainConfig);
         String sign = gson.fromJson(reader, String.class);
         reader.close();
-    }
-
-    public static void saveMachinesConfig() throws IOException {
-        BufferedWriter writer = Files.newBufferedWriter(machinesConfig, StandardOpenOption.CREATE);
-        gson.toJson(MachineManager.machines, writer);
-        writer.close();
-    }
-
-    private static void createMainConfig() throws IOException {
-        BufferedWriter writer = Files.newBufferedWriter(mainConfig, StandardOpenOption.CREATE);
-        gson.toJson("EVM1", writer);
-        writer.close();
     }
 }

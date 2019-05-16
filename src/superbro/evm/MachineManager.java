@@ -15,31 +15,25 @@ public class MachineManager {
 
     static List<MachineItem> machines = new ArrayList<>();
 
-    static List<MachineItem> getMachineList() {
-        return machines;
-    }
-
-    private static void scanMachines() {
+    static void scanMachines() {
 
     }
 
     public static void createMachine(String name) {
-        Optional<MachineItem> item = machines.stream().filter(m -> m.name == name).findAny();
+        Optional<MachineItem> item = machines.stream().filter(m -> m.name.equals(name.toUpperCase())).findAny();
         if(item.isPresent()){
             JOptionPane.showMessageDialog(null, "Machine is already exist", "Can't create machine", JOptionPane.INFORMATION_MESSAGE);
             return;
         }
-        String folder = name.toLowerCase();
-        MachineItem machine = new MachineItem(name, folder);
+        MachineItem machine = new MachineItem(name);
         try {
-            Path path = Config.machinesDirectory.resolve(folder);
+            Path path = Config.machinesDirectory.resolve(machine.name);
             if (Files.exists(path)) {
-                machines.add(machine);
-                Config.saveMachinesConfig();
                 JOptionPane.showMessageDialog(null, "Machine is already exist", "Machine added", JOptionPane.INFORMATION_MESSAGE);
-                return;
             }
-            Files.createDirectory(path);
+            else{
+                Files.createDirectory(path);
+            }
             machines.add(machine);
             Config.saveMachinesConfig();
         } catch (IOException e) {
@@ -54,11 +48,12 @@ public class MachineManager {
 
     public static class MachineItem {
         public String name;
-        private String path;
+        public String title;
+        public Machine instance;
 
-        public MachineItem(String name, String path) {
-            this.name = name;
-            this.path = path;
+        public MachineItem(String title) {
+            this.title = title;
+            this.name = title.toUpperCase();
         }
     }
 }

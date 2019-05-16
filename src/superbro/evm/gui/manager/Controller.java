@@ -38,12 +38,13 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-
+        updateMachinesList();
     }
 
     @FXML
     public void btnNewAction(ActionEvent e) {
         DialogCreateMachine.run();
+        updateMachinesList();
     }
 
     @FXML
@@ -71,12 +72,12 @@ public class Controller implements Initializable {
         GUI.showIDE();
     }
 
-    public void updateMachinesList() {
+    void updateMachinesList() {
         ObservableList items = mList.getItems();
         items.clear();
         List<MachineManager.MachineItem> machines = MachineManager.getMachines();
         for (MachineManager.MachineItem m : machines) {
-            items.add(m.name);
+            items.add(m.title);
         }
     }
 
