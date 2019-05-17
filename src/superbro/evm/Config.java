@@ -32,7 +32,12 @@ public class Config {
             } else {
                 createMainConfig();
             }
-            loadMachinesConfig();
+            if(Files.exists(machinesConfig)){
+                loadMachinesConfig();
+            }
+            else{
+                saveMachinesConfig();
+            }
             MachineManager.scanMachines();
         } catch (IOException e) {
             e.printStackTrace(System.err);

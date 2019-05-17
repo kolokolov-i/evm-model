@@ -32,6 +32,9 @@ public class AsmTranslator extends Translator {
             return;
         }
         List<Token> tokens = lexer.getResult();
+        DataTranslator dTranslator = new DataTranslator(sourceData, messager);
+        dTranslator.parse();
+        Instruct.reset(dTranslator.vars);
         Syntaxer syntaxer = new Syntaxer(tokens, messager);
         success = syntaxer.parse();
         if(!success){

@@ -1,9 +1,11 @@
 package superbro.evm.translator.asm;
 
-public class Label {
+class Label {
     Word token;
+    Instruct target;
 
-    Label(Word token){
+    Label(Word token, Instruct target){
         this.token = token;
+        this.target = target;
     }
 }

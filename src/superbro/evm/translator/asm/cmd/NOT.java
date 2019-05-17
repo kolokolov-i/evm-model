@@ -9,7 +9,7 @@ import java.util.List;
 public class NOT extends Command {
     @Override
     public void generate(List<Short> rr, Argument arg1, Argument arg2) throws ParserException {
-        if (arg1.type == Type.REG8) {
+        /*if (arg1.type == Type.REG8) {
             short r = (short) 0x4000;
             r |= arg1.value & 0b00000111;
             rr.add(r);
@@ -27,6 +27,6 @@ public class NOT extends Command {
             }
             return;
         }
-        throw new ParserException("Invalid argument type");
+        throw new ParserException("Invalid argument type");*/
     }
 }

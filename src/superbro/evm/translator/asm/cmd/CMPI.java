@@ -9,15 +9,15 @@ import java.util.List;
 public class CMPI extends Command {
     @Override
     public void generate(List<Short> rr, Argument arg1, Argument arg2) throws ParserException {
-        if (arg1.type == Type.REG8) {
-            if (arg2.type == Type.NUMBER) {
-                short r = (short) 0x7800;
-                r |= (arg1.value & 0b00000111) << 8;
-                r |= arg2.value & 0xff;
-                rr.add(r);
-                return;
-            }
-        }
-        throw new ParserException("Invalid argument type");
+//        if (arg1.type == Type.REG8) {
+//            if (arg2.type == Type.NUMBER) {
+//                short r = (short) 0x7800;
+//                r |= (arg1.value & 0b00000111) << 8;
+//                r |= arg2.value & 0xff;
+//                rr.add(r);
+//                return;
+//            }
+//        }
+//        throw new ParserException("Invalid argument type");
     }
 }

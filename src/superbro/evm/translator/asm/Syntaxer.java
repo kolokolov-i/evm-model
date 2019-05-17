@@ -2,21 +2,17 @@ package superbro.evm.translator.asm;
 
 import superbro.evm.translator.Messager;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 class Syntaxer {
 
     private List<Token> tokens;
     private Messager messager;
     private List<Instruct> result;
-
     private Iterator<Token> toks;
-    private ArrayList<Label> unresolvedLabels;
     private Word tLabel, tCommand;
     private Token arg1, arg2;
-    private ComplexArg carg;
+    private IndexToken carg;
     private int curArg;
 
     Syntaxer(List<Token> tokens, Messager mes) {
@@ -24,70 +20,7 @@ class Syntaxer {
         toks = tokens.iterator();
         this.messager = mes;
         result = new ArrayList<>();
-        unresolvedLabels = new ArrayList<>(2);
     }
-
-    /*private boolean match(Tag m) {
-        if (look.tag == m) {
-            look = toks.next();
-            return true;
-        }
-        return false;
-    }
-
-    boolean parse() {
-        boolean success = true;
-        if (!toks.hasNext()) {
-            return true;
-        }
-        Instruct instruct;
-        do {
-            instruct = instr();
-            if (instruct != null) {
-                result.add(instruct);
-            }
-        }
-        while (instruct != null);
-        return success;
-    }
-
-    private Instruct instr() {
-        if (!toks.hasNext()) {
-            return null;
-        }
-        Instruct r;
-        if (look.tag != Tag.ID) {
-            messager.error(look.line, 0, "Unexpected token");
-            return null;
-        }
-        Token id1 = look;
-        Word tLabel, tCom;
-        match(Tag.ID);
-        switch (look.tag) {
-            case COLON:
-                match(Tag.COLON);
-                tLabel = (Word) id1;
-                break;
-            case BRAK_A:
-                tCom = (Word) id1;
-                parseComplexArg();
-                break;
-            case ID:
-                break;
-            case NUMBER:
-                break;
-            default:
-                messager.error(look.line, 0, "Unexpected token");
-                return null;
-
-        }
-
-        return r;
-    }
-
-    private void parseComplexArg() {
-
-    }*/
 
     boolean parse() {
         boolean r = true;
@@ -159,7 +92,6 @@ class Syntaxer {
                 case S2:
                     switch (token.tag) {
                         case END:
-                            unresolvedLabels.add(new Label(tLabel));
                             state = State.S0;
                             break;
                         case ID:
@@ -219,7 +151,7 @@ class Syntaxer {
                             break;
                         case ID:
                         case NUMBER:
-                            carg = new ComplexArg(token);
+                            carg = new IndexToken(token);
                             arg1 = carg;
                             state = State.S8;
                             break;
@@ -322,7 +254,7 @@ class Syntaxer {
                             state = State.S0;
                             break;
                         case BRAK_B:
-                            switch (curArg){
+                            switch (curArg) {
                                 case 1:
                                     arg1 = carg;
                                     state = State.S3;
@@ -390,7 +322,7 @@ class Syntaxer {
                             state = State.S0;
                             break;
                         case BRAK_B:
-                            switch (curArg){
+                            switch (curArg) {
                                 case 1:
                                     arg1 = carg;
                                     state = State.S3;
@@ -417,9 +349,7 @@ class Syntaxer {
     }
 
     private void createInstruction() throws ParserException {
-        Instruct instruction = Instruct.create(
-                unresolvedLabels, tCommand, arg1, arg2);
-        unresolvedLabels.clear();
+        Instruct instruction = new Instruct(tLabel, tCommand, arg1, arg2);
         result.add(instruction);
     }
 
@@ -427,8 +357,12 @@ class Syntaxer {
         return result;
     }
 
+//    public Map<String, Label> getLabels() {
+//        return labels;
+//    }
+
     private enum State {
-        S0, S1, S2, S3, S4, S5, S6, S7,
-        S8, S9, S10, S11, S12, S13, S14
+        S0, S1, S2, S3, S4, S5,
+        S6, S7, S8, S9, S10
     }
 }

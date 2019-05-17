@@ -1,10 +1,10 @@
 package superbro.evm.translator.asm;
 
-public class ComplexArg extends Token {
+class IndexToken extends Token {
 
     Token master, slave;
 
-    ComplexArg(Token tok){
+    IndexToken(Token tok){
         super(Tag.INDEX, tok.line, tok.col);
         master = tok;
         slave = null;

@@ -9,28 +9,28 @@ import java.util.List;
 public class MUL extends Command {
     @Override
     public void generate(List<Short> rr, Argument arg1, Argument arg2) throws ParserException {
-        if (arg1.type == Type.REG8) {
-            if (arg2.type == Type.REG8) {
-                short r = (short) 0x7200;
-                r |= (arg1.value & 0b00000111) << 4;
-                r |= arg2.value & 0b00000111;
-                rr.add(r);
-                return;
-            } else {
-                throw new ParserException("Invalid argument type");
-            }
-        }
-        if (arg1.type == Type.REG16) {
-            if (arg2.type == Type.REG16) {
-                short r = (short) 0x7300;
-                r |= (arg1.value & 0b00000011) << 4;
-                r |= arg2.value & 0b00000011;
-                rr.add(r);
-                return;
-            }
-        } else {
-            throw new ParserException("Invalid argument type");
-        }
-        throw new ParserException("Invalid argument type");
+//        if (arg1.type == Type.REG8) {
+//            if (arg2.type == Type.REG8) {
+//                short r = (short) 0x7200;
+//                r |= (arg1.value & 0b00000111) << 4;
+//                r |= arg2.value & 0b00000111;
+//                rr.add(r);
+//                return;
+//            } else {
+//                throw new ParserException("Invalid argument type");
+//            }
+//        }
+//        if (arg1.type == Type.REG16) {
+//            if (arg2.type == Type.REG16) {
+//                short r = (short) 0x7300;
+//                r |= (arg1.value & 0b00000011) << 4;
+//                r |= arg2.value & 0b00000011;
+//                rr.add(r);
+//                return;
+//            }
+//        } else {
+//            throw new ParserException("Invalid argument type");
+//        }
+//        throw new ParserException("Invalid argument type");
     }
 }

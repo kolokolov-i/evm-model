@@ -5,11 +5,9 @@ import superbro.evm.translator.asm.cmd.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 class Instruct {
-
-    Command command;
-    Argument argument1, argument2;
 
     private static HashMap<String, Command> commandMap;
 
@@ -77,116 +75,117 @@ class Instruct {
     }
 
     private static HashMap<String, Argument> words;
+    private static Map<String, Label> labels;
+    private static Map<String, Argument.Address> vars;
 
     static {
         words = new HashMap<>();
-        for(int i=0; i<8; i++){
-            words.put("R"+i, new Argument(Type.REG8, i));
+        for (int i = 0; i < 8; i++) {
+            words.put("R" + i, new Argument.Reg8(i));
         }
-        for(int i=0; i<4; i++){
-            words.put("RM"+i, new Argument(Type.REG16, i));
+        for (int i = 0; i < 4; i++) {
+            words.put("RM" + i, new Argument.Reg16(i));
         }
-        for(int i=0; i<32; i++){
-            words.put("P"+i, new Argument(Type.PORT, i));
+        for (int i = 0; i < 32; i++) {
+            words.put("P" + i, new Argument.Port(i));
         }
+        labels = new HashMap<>();
     }
 
-    private Instruct(String name) throws ParserException {
-        String cname = name.toUpperCase();
+    static void reset(Map<String,Argument.Address> v){
+        labels.clear();
+        vars = v;
+    }
+
+
+    Label label;
+    private Command command;
+    private Token argument1, argument2;
+
+    Instruct(Word label, Word name, Token arg1, Token arg2) throws ParserException {
+        String cname = name.lexeme.toUpperCase();
         if (!commandMap.containsKey(cname)) {
             throw new ParserException("Unknown command \'" + name + "\'");
         }
         this.command = commandMap.get(cname);
-    }
-
-    public static Instruct create(List<Label> labels, Word command, Token arg1, Token arg2) {
-        return null;
+        String s = label.lexeme.toUpperCase();
+        if (labels.containsKey(s)) {
+            throw new ParserException("Label " + s + "is already defined");
+        }
+        labels.put(s, new Label(label, this));
+        argument1 = arg1;
+        argument2 = arg2;
     }
 
     void generate(ArrayList<Short> r) throws ParserException {
-        this.command.generate(r, this.argument1, this.argument2);
+        Argument arg1 = resoluteArgument(argument1);
+        Argument arg2 = resoluteArgument(argument2);
+        this.command.generate(r, arg1, arg2);
     }
 
-    static Instruct create(String com) throws ParserException {
-        Instruct r = new Instruct(com);
-        r.argument1 = Argument.voidArg;
-        r.argument2 = Argument.voidArg;
-        return r;
-    }
-
-    static Instruct create(String com, String arg) throws ParserException {
-        Instruct r = new Instruct(com);
-        Argument arg1;
-        arg1 = words.get(arg.toUpperCase());
-        if(arg1!=null){
-            r.argument1 = arg1;
+    private Argument resoluteArgument(Token token) throws ParserException {
+        if(token==null){
+            return Argument.voidArg;
         }
-        else{
-            throw new ParserException("Unknown variable " + arg);
+        if(token.tag==Tag.NUMBER){
+            return new Argument.Number(((Number)token).value);
         }
-        r.argument2 = Argument.voidArg;
-        return r;
-    }
-
-    static Instruct create(String com, int arg) throws ParserException {
-        Instruct r = new Instruct(com);
-        r.argument1 = new Argument(Type.NUMBER, arg);
-        r.argument2 = Argument.voidArg;
-        return r;
-    }
-
-    static Instruct create(String com, String arg1s, String arg2s) throws ParserException {
-        Instruct r = new Instruct(com);
-        Argument arg1, arg2;
-        arg1 = words.get(arg1s.toUpperCase());
-        if(arg1!=null){
-            r.argument1 = arg1;
+        if(token.tag == Tag.ID){
+            String s = ((Word)token).lexeme.toUpperCase();
+            if(words.containsKey(s)){
+                return words.get(s);
+            }
+            if(labels.containsKey(s)){
+                int offset = 0;
+                //labels.get(s); // TODO offset calculating
+                if(offset>127 || offset<-128){
+                    throw new ParserException("Label is unreachable");
+                }
+                return new Argument.RelAddress((byte)offset);
+            }
+            if(vars.containsKey(s)){
+                return vars.get(s);
+            }
+            throw new ParserException("Unknown identifier "+((Word)token).lexeme);
         }
-        else{
-            throw new ParserException("Unknown variable " + arg1s);
+        if(token.tag==Tag.INDEX){
+            IndexToken tok = (IndexToken) token;
+            Token mToken = tok.master;
+            Argument mArg1;
+            if(mToken.tag == Tag.ID){
+                String s = ((Word)mToken).lexeme.toUpperCase();
+                if(words.containsKey(s)){
+                    mArg1 = words.get(s);
+                }
+                else{
+                    throw new ParserException("Unknown identifier "+((Word)mToken).lexeme);
+                }
+            }
+            else{
+                throw new ParserException("Invalid index type");
+            }
+            if(tok.slave==null){
+                return new Argument.Index(mArg1);
+            }
+            mToken = tok.slave;
+            Argument mArg2;
+            if(mToken.tag==Tag.ID){
+                String s = ((Word)mToken).lexeme.toUpperCase();
+                if(words.containsKey(s)){
+                    mArg2 = words.get(s);
+                }
+                else{
+                    throw new ParserException("Unknown identifier "+((Word)mToken).lexeme);
+                }
+            }
+            else if (mToken.tag==Tag.NUMBER){
+                mArg2 = new Argument.Number(((Number)mToken).value);
+            }
+            else{
+                throw new ParserException("Invalid index type");
+            }
+            return new Argument.IndexPlus(mArg1, mArg2);
         }
-        arg2 = words.get(arg2s.toUpperCase());
-        if(arg2!=null){
-            r.argument2 = arg2;
-        }
-        else{
-            throw new ParserException("Unknown variable " + arg2s);
-        }
-        return r;
-    }
-
-    static Instruct create(String com, String arg1s, int arg2n) throws ParserException {
-        Instruct r = new Instruct(com);
-        Argument arg1;
-        arg1 = words.get(arg1s.toUpperCase());
-        if(arg1!=null){
-            r.argument1 = arg1;
-        }
-        else{
-            throw new ParserException("Unknown variable " + arg1s);
-        }
-        r.argument2 = new Argument(Type.NUMBER, arg2n);
-        return r;
-    }
-
-    static Instruct create(String com, int arg1n, String arg2s) throws ParserException {
-        Instruct r = new Instruct(com);
-        r.argument2 = new Argument(Type.NUMBER, arg1n);
-        Argument arg2;
-        arg2 = words.get(arg2s.toUpperCase());
-        if(arg2!=null){
-            r.argument2 = arg2;
-        }
-        else{
-            throw new ParserException("Unknown variable " + arg2s);
-        }
-        return r;
-    }
-
-    static Instruct create(String com, int arg1n, int arg2n) throws ParserException {
-        Instruct r = new Instruct(com);
-        r.argument1 = new Argument(Type.NUMBER, arg1n);
-        r.argument2 = new Argument(Type.NUMBER, arg2n);
-        return r;
+        throw new ParserException("Invalid argument");
     }
 }
