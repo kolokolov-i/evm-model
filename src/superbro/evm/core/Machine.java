@@ -42,7 +42,7 @@ public class Machine {
     }
 
     public Machine() {
-
+        devices = new Device[8];
     }
 
     public void start() {
@@ -64,7 +64,7 @@ public class Machine {
     private static Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .registerTypeAdapter(Machine.class, new MachineDeserializer())
-            .registerTypeAdapter(Machine.class, new MachineSerializer())
+            //.registerTypeAdapter(Machine.class, new MachineSerializer())
             .create();
 
     private static class MachineDeserializer implements JsonDeserializer<Machine> {
@@ -76,7 +76,10 @@ public class Machine {
             String bios = json.get("bios").getAsString();
             JsonObject devices = json.get("devices").getAsJsonObject();
             for (int i = 0; i < 8; i++) {
-                result.devices[i] = DeviceManager.get(devices.get("dev" + i).getAsString());
+                if(devices.has("dev" + i)){
+                    String devName = devices.get("dev" + i).getAsString();
+                    result.devices[i] = DeviceManager.get(devName);
+                }
             }
             return result;
         }

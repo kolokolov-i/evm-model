@@ -1,5 +1,6 @@
 package superbro.evm.translator.asm;
 
+import superbro.evm.translator.Messager;
 import superbro.evm.translator.asm.cmd.*;
 
 import java.util.ArrayList;
@@ -10,6 +11,7 @@ import java.util.Map;
 class Instruct {
 
     private static HashMap<String, Command> commandMap;
+    private static List<Instruct> instructs;
 
     static {
         commandMap = new HashMap<>();
@@ -92,29 +94,52 @@ class Instruct {
         labels = new HashMap<>();
     }
 
-    static void reset(Map<String,Argument.Address> v){
+    static void reset(Map<String, Argument.Address> v) {
         labels.clear();
         vars = v;
     }
 
-
-    Label label;
+    int line;
+    int offset;
     private Command command;
     private Token argument1, argument2;
 
     Instruct(Word label, Word name, Token arg1, Token arg2) throws ParserException {
+        line = name.line;
         String cname = name.lexeme.toUpperCase();
         if (!commandMap.containsKey(cname)) {
-            throw new ParserException("Unknown command \'" + name + "\'");
+            throw new ParserException("Unknown command \'" + name.lexeme + "\'");
         }
         this.command = commandMap.get(cname);
-        String s = label.lexeme.toUpperCase();
-        if (labels.containsKey(s)) {
-            throw new ParserException("Label " + s + "is already defined");
+        if (label != null) {
+            String s = label.lexeme.toUpperCase();
+            if (labels.containsKey(s)) {
+                throw new ParserException("Label " + s + "is already defined");
+            }
+            labels.put(s, new Label(label, this));
         }
-        labels.put(s, new Label(label, this));
         argument1 = arg1;
         argument2 = arg2;
+    }
+
+    public static void generate(List<Instruct> instructs, ArrayList<Short> raw, Messager messager) {
+        Instruct.instructs = instructs;
+        calculateOffsets();
+        for (Instruct j : instructs) {
+            try {
+                j.generate(raw);
+            } catch (ParserException ex) {
+                messager.error(j.line, 0, ex.getMessage());
+            }
+        }
+    }
+
+    private static void calculateOffsets() {
+        int t = 0;
+        for (Instruct ins : instructs) {
+            ins.offset = t;
+            t += ins.command.getSize(ins.argument1, ins.argument2);
+        }
     }
 
     void generate(ArrayList<Short> r) throws ParserException {
@@ -124,64 +149,58 @@ class Instruct {
     }
 
     private Argument resoluteArgument(Token token) throws ParserException {
-        if(token==null){
+        if (token == null) {
             return Argument.voidArg;
         }
-        if(token.tag==Tag.NUMBER){
-            return new Argument.Number(((Number)token).value);
+        if (token.tag == Tag.NUMBER) {
+            return new Argument.Number(((Number) token).value);
         }
-        if(token.tag == Tag.ID){
-            String s = ((Word)token).lexeme.toUpperCase();
-            if(words.containsKey(s)){
+        if (token.tag == Tag.ID) {
+            String s = ((Word) token).lexeme.toUpperCase();
+            if (words.containsKey(s)) {
                 return words.get(s);
             }
-            if(labels.containsKey(s)){
-                int offset = 0;
-                //labels.get(s); // TODO offset calculating
-                if(offset>127 || offset<-128){
+            if (labels.containsKey(s)) {
+                int offset = this.offset - labels.get(s).target.offset;
+                if (offset > 127 || offset < -128) {
                     throw new ParserException("Label is unreachable");
                 }
-                return new Argument.RelAddress((byte)offset);
+                return new Argument.RelAddress((byte) offset);
             }
-            if(vars.containsKey(s)){
+            if (vars.containsKey(s)) {
                 return vars.get(s);
             }
-            throw new ParserException("Unknown identifier "+((Word)token).lexeme);
+            throw new ParserException("Unknown identifier " + ((Word) token).lexeme);
         }
-        if(token.tag==Tag.INDEX){
+        if (token.tag == Tag.INDEX) {
             IndexToken tok = (IndexToken) token;
             Token mToken = tok.master;
             Argument mArg1;
-            if(mToken.tag == Tag.ID){
-                String s = ((Word)mToken).lexeme.toUpperCase();
-                if(words.containsKey(s)){
+            if (mToken.tag == Tag.ID) {
+                String s = ((Word) mToken).lexeme.toUpperCase();
+                if (words.containsKey(s)) {
                     mArg1 = words.get(s);
+                } else {
+                    throw new ParserException("Unknown identifier " + ((Word) mToken).lexeme);
                 }
-                else{
-                    throw new ParserException("Unknown identifier "+((Word)mToken).lexeme);
-                }
-            }
-            else{
+            } else {
                 throw new ParserException("Invalid index type");
             }
-            if(tok.slave==null){
+            if (tok.slave == null) {
                 return new Argument.Index(mArg1);
             }
             mToken = tok.slave;
             Argument mArg2;
-            if(mToken.tag==Tag.ID){
-                String s = ((Word)mToken).lexeme.toUpperCase();
-                if(words.containsKey(s)){
+            if (mToken.tag == Tag.ID) {
+                String s = ((Word) mToken).lexeme.toUpperCase();
+                if (words.containsKey(s)) {
                     mArg2 = words.get(s);
+                } else {
+                    throw new ParserException("Unknown identifier " + ((Word) mToken).lexeme);
                 }
-                else{
-                    throw new ParserException("Unknown identifier "+((Word)mToken).lexeme);
-                }
-            }
-            else if (mToken.tag==Tag.NUMBER){
-                mArg2 = new Argument.Number(((Number)mToken).value);
-            }
-            else{
+            } else if (mToken.tag == Tag.NUMBER) {
+                mArg2 = new Argument.Number(((Number) mToken).value);
+            } else {
                 throw new ParserException("Invalid index type");
             }
             return new Argument.IndexPlus(mArg1, mArg2);

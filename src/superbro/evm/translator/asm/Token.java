@@ -1,6 +1,6 @@
 package superbro.evm.translator.asm;
 
-class Token {
+public class Token {
 
     Tag tag;
     int line, col;

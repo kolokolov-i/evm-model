@@ -41,16 +41,10 @@ public class AsmTranslator extends Translator {
             return;
         }
         List<Instruct> instructs = syntaxer.getResult();
-        ArrayList<Short> r = new ArrayList<>(1000);
+        ArrayList<Short> raw = new ArrayList<>(1000);
+        Instruct.generate(instructs, raw, messager);
         StringBuilder listingBuilder = new StringBuilder();
-        for (Instruct j : instructs) {
-            try {
-                j.generate(r);
-            } catch (ParserException ex) {
-                messager.error(0, 0, ex.getMessage());
-            }
-        }
-        for(Short t : r){
+        for(Short t : raw){
             listingBuilder.append(String.format("%04x\n", t));
         }
         listingCode = listingBuilder.toString();

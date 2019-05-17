@@ -22,9 +22,11 @@ public class MachineManager {
                 try {
                     m.instance = Machine.loadFrom(path);
                     m.status = Status.IDLE;
-                } catch (IOException e) {
+                    m.desription = "Ready";
+                } catch (Exception e) {
                     m.instance = null;
                     m.status = Status.ERROR;
+                    m.desription = "Loading error";
                 }
             }
         }
@@ -62,6 +64,7 @@ public class MachineManager {
         public String title;
         transient public Machine instance;
         transient public Status status;
+        transient public String desription;
 
         public MachineItem(String title) {
             this.title = title;

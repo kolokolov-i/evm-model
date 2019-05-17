@@ -2,6 +2,7 @@ package superbro.evm.translator.asm.cmd;
 
 import superbro.evm.translator.asm.Argument;
 import superbro.evm.translator.asm.ParserException;
+import superbro.evm.translator.asm.Token;
 import superbro.evm.translator.asm.Type;
 
 import java.util.List;
@@ -19,5 +20,10 @@ public class MOVI extends Command {
 //            }
 //        }
 //        throw new ParserException("Invalid argument type");
+    }
+
+    @Override
+    public int getSize(Token arg1, Token arg2) {
+        return 1;
     }
 }
