@@ -9,66 +9,66 @@ public class Argument {
         //value = v;
     }
 
-    static Argument voidArg = new Argument(Type.NONE);
+    public static Argument voidArg = new Argument(Type.NONE);
 
-    static class Number extends Argument {
-        int value;
+    public static class Number extends Argument {
+        public int value;
         Number(int number) {
             super(Type.NUMBER);
             value = number;
         }
     }
 
-    static class Reg8 extends Argument {
-        int value;
+    public static class Reg8 extends Argument {
+        public int value;
         Reg8(int index){
             super(Type.REG8);
             value = index;
         }
     }
 
-    static class Reg16 extends Argument {
-        int value;
+    public static class Reg16 extends Argument {
+        public int value;
         Reg16(int index){
             super(Type.REG16);
             value = index;
         }
     }
 
-    static class Port extends Argument {
-        int value;
+    public static class Port extends Argument {
+        public int value;
         Port(int index){
             super(Type.PORT);
             value = index;
         }
     }
 
-    static class RelAddress extends Argument {
-        int offset;
+    public static class RelAddress extends Argument {
+        public int offset;
         RelAddress(byte ofst){
             super(Type.NUMBER);
             offset = ofst;
         }
     }
 
-    static class Address extends Argument {
-        int address;
+    public static class Address extends Argument {
+        public int address;
         Address(int a){
             super(Type.NUMBER);
             address = a;
         }
     }
 
-    static class Index extends Argument {
-        Argument argument;
+    public static class Index extends Argument {
+        public Argument argument;
         Index(Argument a){
             super(Type.INDEX);
             argument = a;
         }
     }
 
-    static class IndexPlus extends Argument {
-        Argument arg1, arg2;
+    public static class IndexPlus extends Argument {
+        public Argument arg1, arg2;
         IndexPlus(Argument a1, Argument a2){
             super(Type.INDEXPLUS);
             arg1 = a1;

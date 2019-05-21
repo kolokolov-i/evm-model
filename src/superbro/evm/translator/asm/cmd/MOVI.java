@@ -1,25 +1,19 @@
 package superbro.evm.translator.asm.cmd;
 
-import superbro.evm.translator.asm.Argument;
-import superbro.evm.translator.asm.ParserException;
-import superbro.evm.translator.asm.Token;
-import superbro.evm.translator.asm.Type;
+import superbro.evm.translator.asm.*;
 
 import java.util.List;
 
 public class MOVI extends Command {
     @Override
     public void generate(List<Short> rr, Argument arg1, Argument arg2) throws ParserException {
-//        if (arg1.type == Type.REG8) {
-//            if (arg2.type == Type.NUMBER) {
-//                short r = (short) 0x8800;
-//                r |= (arg1.value & 0b00000111) << 8;
-//                r |= arg2.value & 0xff;
-//                rr.add(r);
-//                return;
-//            }
-//        }
-//        throw new ParserException("Invalid argument type");
+        if (arg1.type == Type.REG8) {
+            if (arg2.type == Type.NUMBER) {
+                rr.add(Code.gen_R8_N(0x8800, arg1, arg2));
+                return;
+            }
+        }
+        throw new ParserException("Invalid argument type");
     }
 
     @Override
