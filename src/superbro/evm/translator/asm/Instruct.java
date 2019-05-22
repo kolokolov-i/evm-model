@@ -129,7 +129,13 @@ class Instruct {
             try {
                 j.generate(raw);
             } catch (ParserException ex) {
-                messager.error(j.line, 0, ex.getMessage());
+                switch(ex.type){
+                    case ERROR:
+                        messager.error(j.line, 0, ex.getMessage());
+                        break;
+                    case WARNING:
+                        messager.warning(j.line, 0, ex.getMessage());
+                }
             }
         }
     }

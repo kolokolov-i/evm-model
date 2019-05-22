@@ -13,7 +13,7 @@ public class ANDI extends Command {
                 return;
             }
         }
-        throw new ParserException("Invalid argument type");
+        throw ParserException.invalidArgumentType();
     }
 
     @Override

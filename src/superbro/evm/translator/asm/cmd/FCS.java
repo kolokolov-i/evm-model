@@ -12,7 +12,7 @@ public class FCS extends Command {
     public void generate(List<Short> rr, Argument arg1, Argument arg2) throws ParserException {
         rr.add((short) 0x0712);
         if (arg1.type != Type.NONE) {
-            throw new ParserException("Redundant argument");
+            throw ParserException.redundantArgument();
         }
     }
 

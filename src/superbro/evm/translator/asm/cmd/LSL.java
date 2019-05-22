@@ -1,46 +1,37 @@
 package superbro.evm.translator.asm.cmd;
 
-import superbro.evm.translator.asm.Argument;
-import superbro.evm.translator.asm.ParserException;
-import superbro.evm.translator.asm.Token;
-import superbro.evm.translator.asm.Type;
+import superbro.evm.translator.asm.*;
 
 import java.util.List;
 
 public class LSL extends Command {
     @Override
     public void generate(List<Short> rr, Argument arg1, Argument arg2) throws ParserException {
-//        if (arg1.type == Type.REG8) {
-//            if(arg2.type==Type.NUMBER){
-//                if(arg2.value >= 8){
-//                    throw new ParserException("Number must be <8");
-//                }
-//                short r = (short) 0x4200;
-//                r |= (arg1.value & 0b00000111) << 4;
-//                r |= arg2.value & 0b00000111;
-//                rr.add(r);
-//                return;
-//            }
-//            else{
-//                throw new ParserException("Invalid argument type");
-//            }
-//        }
-//        if (arg1.type == Type.REG16) {
-//            if(arg2.type==Type.NUMBER){
-//                if(arg2.value >= 16){
-//                    throw new ParserException("Number must be <16");
-//                }
-//                short r = (short) 0x4300;
-//                r |= (arg1.value & 0b00000011) << 4;
-//                r |= arg2.value & 0b00001111;
-//                rr.add(r);
-//                return;
-//            }
-//            else{
-//                throw new ParserException("Invalid argument type");
-//            }
-//        }
-//        throw new ParserException("Invalid argument type");
+        if (arg1.type == Type.REG8) {
+            if(arg2.type==Type.NUMBER){
+                if(((Argument.Number)arg2).value >= 8){
+                    throw ParserException.numberMustBeUnder8();
+                }
+                rr.add(Code.gen_R8_N3(0x4200, arg1, arg2));
+                return;
+            }
+            else{
+                throw ParserException.invalidArgumentType();
+            }
+        }
+        if (arg1.type == Type.REG16) {
+            if(arg2.type==Type.NUMBER){
+                if(((Argument.Number)arg2).value >= 16){
+                    throw ParserException.numberMustBeUnder16();
+                }
+                rr.add(Code.gen_R16_N4(0x4300, arg1, arg2));
+                return;
+            }
+            else{
+                throw ParserException.invalidArgumentType();
+            }
+        }
+        throw ParserException.invalidArgumentType();
     }
 
     @Override

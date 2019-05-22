@@ -17,12 +17,12 @@ public class INT extends Command {
 //            }
 //            r |= (arg1.value & 0x0f) << 4;
 //            if (arg2.type != Type.NONE) {
-//                throw new ParserException("Redundant argument");
+//                throw ParserException.redundantArgument();
 //            }
 //            rr.add(r);
 //            return;
 //        }
-//        throw new ParserException("Invalid argument type");
+//        throw ParserException.invalidArgumentType();
     }
 
     @Override

@@ -11,13 +11,13 @@ public class RJMPZ extends Command {
     @Override
     public void generate(List<Short> rr, Argument arg1, Argument arg2) throws ParserException {
 //        if (arg1.type != Type.NUMBER) {
-//            throw new ParserException("Invalid argument type");
+//            throw ParserException.invalidArgumentType();
 //        }
 //        short r = (short) 0x0800;
 //        r |= arg1.value & 0xff;
 //        rr.add(r);
 //        if (arg2.type != Type.NONE) {
-//            throw new ParserException("Redundant argument");
+//            throw ParserException.redundantArgument();
 //        }
     }
 

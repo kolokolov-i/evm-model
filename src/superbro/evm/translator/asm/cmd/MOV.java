@@ -15,7 +15,7 @@ public class MOV extends Command {
                 rr.add(Code.gen_R8_N(0x8800, arg1, arg2));
                 return;
             } else {
-                throw new ParserException("Invalid argument type");
+                throw ParserException.invalidArgumentType();
             }
         }
         if (arg1.type == Type.REG16) {
@@ -24,9 +24,9 @@ public class MOV extends Command {
                 return;
             }
         } else {
-            throw new ParserException("Invalid argument type");
+            throw ParserException.invalidArgumentType();
         }
-        throw new ParserException("Invalid argument type");
+        throw ParserException.invalidArgumentType();
     }
 
     @Override
