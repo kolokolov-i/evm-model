@@ -1,9 +1,6 @@
 package superbro.evm.translator.asm.cmd;
 
-import superbro.evm.translator.asm.Argument;
-import superbro.evm.translator.asm.ParserException;
-import superbro.evm.translator.asm.Token;
-import superbro.evm.translator.asm.Type;
+import superbro.evm.translator.asm.*;
 
 import java.util.List;
 
@@ -13,9 +10,7 @@ public class CALL extends Command {
         if (arg1.type != Type.REG16) {
             throw ParserException.invalidArgumentType();
         }
-        short r = (short) 0x0140;
-        r |= ((Argument.Reg16)arg1).value & 0b00000011;
-        rr.add(r);
+        rr.add(Code.gen_R16(0x0140, arg1));
         if (arg2.type != Type.NONE) {
             throw ParserException.redundantArgument();
         }

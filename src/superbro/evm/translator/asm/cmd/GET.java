@@ -4,16 +4,19 @@ import superbro.evm.translator.asm.*;
 
 import java.util.List;
 
-public class RJMPS extends Command {
+public class GET extends Command {
     @Override
     public void generate(List<Short> rr, Argument arg1, Argument arg2) throws ParserException {
-        if (arg1.type != Type.NUMBER) {
+        if (arg2.type != Type.PORT) {
             throw ParserException.invalidArgumentType();
         }
-        rr.add(Code.gen_N8(0x0900, arg1));
-        if (arg2.type != Type.NONE) {
-            throw ParserException.redundantArgument();
+        if (arg1.type != Type.REG8) {
+            throw ParserException.invalidArgumentType();
         }
+        short t;
+        t = Code.form_R8(0xA600, arg1, 0);
+        t = Code.form_P5(t, arg2, 3);
+        rr.add(t);
     }
 
     @Override

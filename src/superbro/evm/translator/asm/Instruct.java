@@ -24,14 +24,14 @@ class Instruct {
         commandMap.put("IRET", new IRET());
         commandMap.put("JUMP", new JUMP());
         commandMap.put("RJMP", new RJMP());
-        commandMap.put("RJMPZ", new RJMPZ());
-        commandMap.put("RJMPS", new RJMPS());
-        commandMap.put("RJMPC", new RJMPC());
-        commandMap.put("RJMPO", new RJMPO());
-        commandMap.put("RJMPNZ", new RJMPNZ());
-        commandMap.put("RJMPNS", new RJMPNS());
-        commandMap.put("RJMPNC", new RJMPNC());
-        commandMap.put("RJMPNO", new RJMPNO());
+        commandMap.put("JMPZ", new RJMPZ());
+        commandMap.put("JMPS", new RJMPS());
+        commandMap.put("JMPC", new RJMPC());
+        commandMap.put("JMPO", new RJMPO());
+        commandMap.put("JMPNZ", new RJMPNZ());
+        commandMap.put("JMPNS", new RJMPNS());
+        commandMap.put("JMPNC", new RJMPNC());
+        commandMap.put("JMPNO", new RJMPNO());
         commandMap.put("CMP", new CMP());
         commandMap.put("CMPI", new CMPI());
         commandMap.put("TST", new TST());
@@ -74,6 +74,18 @@ class Instruct {
         commandMap.put("MOV", new MOV());
         commandMap.put("MOVI", new MOVI());
         commandMap.put("SWAP", new SWAP());
+        commandMap.put("LOAD", new LOAD());
+        commandMap.put("LOADX", new LOADX());
+        commandMap.put("STOR", new STOR());
+        commandMap.put("STORX", new STORX());
+        commandMap.put("STORI", new STORI());
+        commandMap.put("LOADF", new LOADF());
+        commandMap.put("STORF", new STORF());
+        commandMap.put("PUT", new PUT());
+        commandMap.put("GET", new GET());
+        commandMap.put("PUSH", new PUSH());
+        commandMap.put("PUSHI", new PUSHI());
+        commandMap.put("POP", new POP());
     }
 
     private static HashMap<String, Argument> words;
@@ -148,7 +160,7 @@ class Instruct {
         }
     }
 
-    void generate(ArrayList<Short> r) throws ParserException {
+    private void generate(ArrayList<Short> r) throws ParserException {
         Argument arg1 = resoluteArgument(argument1);
         Argument arg2 = resoluteArgument(argument2);
         this.command.generate(r, arg1, arg2);

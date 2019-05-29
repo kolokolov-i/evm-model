@@ -4,13 +4,15 @@ import superbro.evm.translator.asm.*;
 
 import java.util.List;
 
-public class RJMPS extends Command {
+public class LOADF extends Command {
     @Override
     public void generate(List<Short> rr, Argument arg1, Argument arg2) throws ParserException {
-        if (arg1.type != Type.NUMBER) {
+        if (arg1.type != Type.REG8) {
             throw ParserException.invalidArgumentType();
         }
-        rr.add(Code.gen_N8(0x0900, arg1));
+        short t;
+        t = Code.gen_R8(0xA100, arg1);
+        rr.add(t);
         if (arg2.type != Type.NONE) {
             throw ParserException.redundantArgument();
         }

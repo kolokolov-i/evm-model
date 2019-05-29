@@ -54,4 +54,20 @@ public class Code {
         r |= ((Argument.Number) a1).value & 0xff;
         return r;
     }
+
+    public static short form_R8(int base, Argument a, int shifting){
+        return (short)(base | (((Argument.Reg8)a).value << shifting));
+    }
+
+    public static short form_R16(int base, Argument a, int shifting){
+        return (short)(base | (((Argument.Reg16)a).value << shifting));
+    }
+
+    public static short form_N8(int base, Argument a, int shifting){
+        return (short)(base | (((Argument.Number)a).value << shifting));
+    }
+
+    public static short form_P5(int base, Argument a, int shifting){
+        return (short)(base | ((((Argument.Port)a).value & 0x1f)<< shifting));
+    }
 }

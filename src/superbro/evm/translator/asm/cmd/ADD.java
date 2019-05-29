@@ -9,7 +9,6 @@ public class ADD extends Command {
     public void generate(List<Short> rr, Argument arg1, Argument arg2) throws ParserException {
         if (arg1.type == Type.REG8) {
             if (arg2.type == Type.REG8) {
-                short r = (short) 0x5000;
                 rr.add(Code.gen_R8_R8(0x5000, arg1, arg2));
                 return;
             } else if (arg2.type == Type.NUMBER) {
