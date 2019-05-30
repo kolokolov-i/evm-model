@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Messager {
 
-    List<MessageRecord> eList, wList;
+    private List<MessageRecord> eList, wList;
 
     public Messager() {
         eList = new ArrayList<>();
@@ -26,5 +26,10 @@ public class Messager {
 
     public List<MessageRecord> getWarnings() {
         return wList;
+    }
+
+    public void reset(){
+        eList.clear();
+        wList.clear();
     }
 }

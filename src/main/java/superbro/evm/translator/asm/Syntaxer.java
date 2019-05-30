@@ -4,7 +4,7 @@ import superbro.evm.translator.Messager;
 
 import java.util.*;
 
-class Syntaxer {
+public class Syntaxer {
 
     private List<Token> tokens;
     private Messager messager;
@@ -22,7 +22,7 @@ class Syntaxer {
         result = new ArrayList<>();
     }
 
-    boolean parse() {
+    public boolean parse() {
         boolean r = true;
         State state = State.S0;
         while (toks.hasNext()) {
@@ -353,7 +353,7 @@ class Syntaxer {
         result.add(instruction);
     }
 
-    List<Instruct> getResult() {
+    public List<Instruct> getResult() {
         return result;
     }
 
