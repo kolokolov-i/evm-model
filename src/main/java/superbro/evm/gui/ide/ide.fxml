@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" style="-fx-font: 12 Helvetica;" stylesheets="@ide.css" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="superbro.evm.gui.ide.Controller">
+   <top>
+      <VBox>
+         <children>
+            <MenuBar BorderPane.alignment="CENTER">
+              <menus>
+                <Menu mnemonicParsing="false" text="File">
+                  <items>
+                        <MenuItem mnemonicParsing="false" onAction="#btnActionNew" text="New" />
+                        <MenuItem mnemonicParsing="false" onAction="#btnActionOpen" text="Open" />
+                        <MenuItem mnemonicParsing="false" onAction="#btnActionSave" text="Save" />
+                        <MenuItem mnemonicParsing="false" onAction="#btnActionSaveAs" text="Save As" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                        <MenuItem mnemonicParsing="false" text="Settings" />
+                        <SeparatorMenuItem mnemonicParsing="false" />
+                    <MenuItem mnemonicParsing="false" text="Close" />
+                  </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Edit">
+                  <items>
+                        <MenuItem mnemonicParsing="false" text="Cut" />
+                        <MenuItem mnemonicParsing="false" text="Copy" />
+                        <MenuItem mnemonicParsing="false" text="Paste" />
+                    <MenuItem mnemonicParsing="false" text="Delete" />
+                  </items>
+                </Menu>
+                <Menu mnemonicParsing="false" text="Help">
+                  <items>
+                        <MenuItem mnemonicParsing="false" text="Help" />
+                    <MenuItem mnemonicParsing="false" text="About" />
+                  </items>
+                </Menu>
+              </menus>
+            </MenuBar>
+         </children>
+      </VBox>
+   </top>
+   <bottom>
+      <Accordion fx:id="messageAccordion" BorderPane.alignment="CENTER">
+        <panes>
+          <TitledPane fx:id="messagePane" animated="false" text="Messages">
+               <content>
+                  <ListView fx:id="messageList" prefHeight="200.0" prefWidth="200.0" />
+               </content>
+            </TitledPane>
+        </panes>
+      </Accordion>
+   </bottom>
+   <center>
+      <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <center>
+            <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+              <tabs>
+                <Tab text="Text Code">
+                     <content>
+                        <TextArea fx:id="textCode" styleClass="code" />
+                     </content>
+                  </Tab>
+                <Tab text="Text Data">
+                     <content>
+                        <TextArea fx:id="textData" prefHeight="200.0" prefWidth="200.0" />
+                     </content>
+                  </Tab>
+              </tabs>
+            </TabPane>
+         </center>
+         <top>
+            <ToolBar prefHeight="40.0" prefWidth="200.0" styleClass="label" stylesheets="@ide.css" BorderPane.alignment="CENTER">
+              <items>
+                  <Button mnemonicParsing="false" onAction="#btnActionNew" styleClass="label" stylesheets="@ide.css" text="New" />
+                <Button mnemonicParsing="false" onAction="#btnActionOpen" text="Open" />
+                  <Button mnemonicParsing="false" onAction="#btnActionSave" text="Save" />
+                  <Button mnemonicParsing="false" onAction="#btnActionTranslate" text="Translate" />
+              </items>
+            </ToolBar>
+         </top>
+      </BorderPane>
+   </center>
+   <right>
+      <BorderPane prefHeight="200.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+         <center>
+            <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
+              <tabs>
+                <Tab text="Binary Code">
+                     <content>
+                        <TextArea fx:id="binCode" prefHeight="238.0" prefWidth="200.0" styleClass="code" />
+                     </content>
+                </Tab>
+                <Tab text="Binary Data">
+                     <content>
+                        <TextArea fx:id="binData" editable="false" prefHeight="200.0" prefWidth="200.0" styleClass="code" />
+                     </content>
+                </Tab>
+              </tabs>
+            </TabPane>
+         </center>
+         <top>
+            <VBox BorderPane.alignment="CENTER">
+               <children>
+                  <ToolBar prefHeight="40.0" prefWidth="200.0">
+                    <items>
+                      <Button mnemonicParsing="false" text="Save" />
+                        <Button mnemonicParsing="false" text="Load" />
+                        <TextField prefWidth="50.0" promptText="Page" />
+                    </items>
+                  </ToolBar>
+               </children>
+            </VBox>
+         </top>
+      </BorderPane>
+   </right>
+</BorderPane>
