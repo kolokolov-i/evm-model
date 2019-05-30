@@ -54,7 +54,7 @@ public class GUI {
     }
 
     private static void loadIDEStage() throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/gui/ide/ide.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(GUI.class.getResource("/superbro/evm/gui/ide/ide.fxml"));
         Parent root = fxmlLoader.load();
         ideController = fxmlLoader.getController();
         ideStage = new Stage();
@@ -63,7 +63,7 @@ public class GUI {
     }
 
     private static void loadManagerStage(Stage primaryStage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("/gui/manager/manager.fxml"));
+        FXMLLoader fxmlLoader = new FXMLLoader(GUI.class.getResource("/superbro/evm/gui/manager/manager.fxml"));
         Parent root = fxmlLoader.load();
         managerController = fxmlLoader.getController();
         primaryStage.setTitle("EVM Manager");
