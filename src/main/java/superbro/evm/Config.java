@@ -57,12 +57,11 @@ public class Config {
     }
 
     static void saveMachinesConfig() throws IOException {
-        BufferedWriter writer = Files.newBufferedWriter(machinesConfig, StandardOpenOption.CREATE);
+        BufferedWriter writer;
+        writer = Files.newBufferedWriter(machinesConfig,
+                StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         gson.toJson(MachineManager.machines, writer);
         writer.close();
-        /*for(MachineManager.MachineItem m : MachineManager.machines){
-            Files.createDirectory(machinesDirectory.resolve(m.name));
-        }*/
     }
 
     private static void loadMachinesConfig() throws IOException {

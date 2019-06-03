@@ -1,7 +1,5 @@
 package superbro.evm.gui.manager;
 
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -13,8 +11,6 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import superbro.evm.MachineManager;
 import superbro.evm.gui.GUI;
-
-import javax.swing.*;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
@@ -65,7 +61,7 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        System.out.println("controller init");
+        //System.out.println("controller init");
         updateMachinesList();
         mList.setCellFactory(machineListView -> new MachineListViewCell());
         mList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -87,22 +83,46 @@ public class Controller implements Initializable {
 
     @FXML
     public void btnDeleteAction(ActionEvent e) {
-
+        if (selectedMachine == null) {
+            return;
+        }
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Delete machine");
+        alert.setHeaderText("Are you sure want to delete machine from list?");
+        alert.setContentText(selectedMachine.title);
+        alert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                MachineManager.deleteMachine(selectedMachine);
+                updateMachinesList();
+            }
+        });
     }
 
     @FXML
     public void btnStartAction(ActionEvent e) {
-
+        if (selectedMachine == null) {
+            return;
+        }
+        selectedMachine.start();
+        updateMachinesList();
     }
 
     @FXML
     public void btnResetAction(ActionEvent e) {
-
+        if (selectedMachine == null) {
+            return;
+        }
+        selectedMachine.reset();
+        updateMachinesList();
     }
 
     @FXML
     public void btnPoweroffAction(ActionEvent e) {
-
+        if (selectedMachine == null) {
+            return;
+        }
+        selectedMachine.poweroff();
+        updateMachinesList();
     }
 
     @FXML
@@ -112,12 +132,12 @@ public class Controller implements Initializable {
 
     @FXML
     public void btnInspector(ActionEvent e) {
-        if(selectedMachine == null){
+        if (selectedMachine == null) {
             return;
         }
-        superbro.evm.gui.inspector.Controller inspector;
+        //superbro.evm.gui.inspector.Controller inspector;
         try {
-            inspector = GUI.showInspector(selectedMachine);
+            GUI.showInspector(selectedMachine);
         } catch (IOException ex) {
             ex.printStackTrace();
         }
@@ -125,10 +145,11 @@ public class Controller implements Initializable {
 
     private void updateMachinesList() {
         mList.setItems(FXCollections.observableArrayList(MachineManager.getMachines()));
+        mList.refresh();
     }
 
-    private void updateViewForMachine(){
-        if(selectedMachine==null){
+    private void updateViewForMachine() {
+        if (selectedMachine == null) {
             mName.setText("");
             return;
         }
@@ -137,7 +158,7 @@ public class Controller implements Initializable {
 
     @FXML
     public void greenRectClick(MouseEvent e) {
-        JOptionPane.showMessageDialog(null, "Hi", "EVM", JOptionPane.INFORMATION_MESSAGE);
+
     }
 
     class MachineListViewCell extends ListCell<MachineManager.MachineItem> {
@@ -145,28 +166,35 @@ public class Controller implements Initializable {
         @Override
         protected void updateItem(MachineManager.MachineItem item, boolean empty) {
             super.updateItem(item, empty);
-            if(empty){
+            if (empty) {
+                setText("");
                 return;
             }
-            if(item==null){
+            if (item == null) {
+                setText("");
                 return;
             }
             Color c;
-            setText(item.title);
-            switch (item.status){
+            String state;
+            switch (item.status) {
                 case RUN:
                     c = Color.rgb(0, 140, 70);
+                    state = " [ RUN ]";
                     break;
                 case PAUSE:
                     c = Color.rgb(0, 80, 160);
+                    state = " [ PAUSE ]";
                     break;
                 case ERROR:
                     c = Color.rgb(190, 20, 0);
+                    state = " [ ERROR ]";
                     break;
                 case IDLE:
                 default:
                     c = Color.BLACK;
+                    state = "";
             }
+            setText(item.title + state);
             setTextFill(c);
         }
     }

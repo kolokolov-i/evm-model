@@ -1,7 +1,9 @@
 package superbro.evm.core;
 
 import com.google.gson.*;
+import superbro.evm.core.cpu.MachineThread;
 import superbro.evm.core.device.Empty;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -13,48 +15,46 @@ import java.nio.file.StandardOpenOption;
 public class Machine {
 
     private Device[] devices;
+    private boolean[] devAutostart;
     private Memory.Byte
             memoryData, memoryStack;
     private Memory.Word
             memoryBIOS, memoryCode;
     private String modelBIOS;
     private CPU cpu;
+    private MachineThread machineThread;
 
     private static Memory.Word stdBIOS;
 
-    public static void setStdBIOS(Memory.Word mem){
+    public static void setStdBIOS(Memory.Word mem) {
         stdBIOS = mem;
     }
 
     public static Machine loadFrom(Path path) throws IOException {
         BufferedReader reader = Files.newBufferedReader(path.resolve("machine.json"));
         Machine machine = gson.fromJson(reader, Machine.class);
-        if(machine.modelBIOS.equals("std")){
+        if (machine.modelBIOS.equals("std")) {
             machine.memoryBIOS = stdBIOS.clone();
-        }
-        else{
+        } else {
             Path fmBios = path.resolve("bios.mem");
             machine.memoryBIOS = new Memory.Word(Files.newInputStream(fmBios));
         }
         Path fmCode = path.resolve("code.mem");
-        if(Files.exists(fmCode)){
+        if (Files.exists(fmCode)) {
             machine.memoryCode = new Memory.Word(Files.newInputStream(fmCode));
-        }
-        else{
+        } else {
             machine.memoryCode = new Memory.Word();
         }
         Path fmData = path.resolve("data.mem");
-        if(Files.exists(fmCode)){
+        if (Files.exists(fmCode)) {
             machine.memoryData = new Memory.Byte(Files.newInputStream(fmData));
-        }
-        else{
+        } else {
             machine.memoryData = new Memory.Byte();
         }
         Path fmStack = path.resolve("stack.mem");
-        if(Files.exists(fmCode)){
+        if (Files.exists(fmCode)) {
             machine.memoryStack = new Memory.Byte(Files.newInputStream(fmStack));
-        }
-        else{
+        } else {
             machine.memoryStack = new Memory.Byte();
         }
         return machine;
@@ -66,38 +66,49 @@ public class Machine {
         writer.close();
     }
 
-    public static Machine getStandardInstance(){
+    public static Machine getStandardInstance() {
         Machine result = new Machine();
         result.modelBIOS = "std";
         result.memoryBIOS = stdBIOS;
         result.memoryCode = new Memory.Word();
         result.memoryData = new Memory.Byte();
         result.memoryStack = new Memory.Byte();
-        result.cpu = new CPU(result);
         return result;
     }
 
     public Machine() {
         devices = new Device[8];
-        for(int i = 0; i<8; i++){
+        devAutostart = new boolean[8];
+        for (int i = 0; i < 8; i++) {
             devices[i] = new Empty();
+            devAutostart[i] = false;
         }
+        this.cpu = new CPU(this);
+    }
+
+    public void step() {
+        short command = memoryCode.data[cpu.PC.value];
+        cpu.execute(command);
     }
 
     public void start() {
-
+        machineThread = new MachineThread(this);
+        machineThread.start();
     }
 
     public void pause() {
-
+        machineThread.interrupt();
     }
 
     public void poweroff() {
-
+        cpu.reset();
+        machineThread.interrupt();
     }
 
     public void reset() {
-
+        cpu.reset();
+        machineThread = new MachineThread(this);
+        machineThread.start();
     }
 
     private static Gson gson = new GsonBuilder()
@@ -114,9 +125,11 @@ public class Machine {
             result.modelBIOS = json.get("bios").getAsString();
             JsonObject devices = json.get("devices").getAsJsonObject();
             for (int i = 0; i < 8; i++) {
-                if(devices.has("dev" + i)){
-                    String devName = devices.get("dev" + i).getAsString();
-                    result.devices[i] = DeviceManager.get(devName);
+                if (devices.has("dev" + i)) {
+                    JsonObject devObj = devices.get("dev" + i).getAsJsonObject();
+                    Device dev = DeviceManager.get(devObj.get("name").getAsString());
+                    result.devices[i] = dev;
+                    result.devAutostart[i] = devObj.get("autostart").getAsBoolean();
                 }
             }
             return result;
@@ -130,7 +143,10 @@ public class Machine {
             result.addProperty("bios", "std");
             JsonObject devices = new JsonObject();
             for (int i = 0; i < 8; i++) {
-                devices.addProperty("dev" + i, machine.devices[i].getName());
+                JsonObject devObj = new JsonObject();
+                devObj.addProperty("name", machine.devices[i].getName());
+                devObj.addProperty("autostart", machine.devAutostart[i]);
+                devices.add("dev" + i, devObj);
             }
             result.add("devices", devices);
             return result;

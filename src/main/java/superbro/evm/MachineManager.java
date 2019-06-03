@@ -1,8 +1,8 @@
 package superbro.evm;
 
+import javafx.scene.control.Alert;
 import superbro.evm.core.Machine;
 
-import javax.swing.*;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -19,11 +19,12 @@ public class MachineManager {
                 try {
                     m.instance = Machine.loadFrom(path);
                     m.status = Status.IDLE;
-                    m.desription = "Ready";
+                    m.description = "Ready";
                 } catch (Exception e) {
+                    e.printStackTrace();
                     m.instance = null;
                     m.status = Status.ERROR;
-                    m.desription = "Loading error";
+                    m.description = "Loading error";
                 }
             }
         }
@@ -32,14 +33,22 @@ public class MachineManager {
     public static void createMachine(String name) {
         Optional<MachineItem> item = machines.stream().filter(m -> m.name.equals(name.toUpperCase())).findAny();
         if (item.isPresent()) {
-            JOptionPane.showMessageDialog(null, "Machine is already exist", "Can't create machine", JOptionPane.INFORMATION_MESSAGE);
+            Alert alert = new Alert(Alert.AlertType.INFORMATION);
+            alert.setTitle("Create machine");
+            alert.setHeaderText("Machine is already exist");
+            alert.setContentText(name);
+            alert.showAndWait();
             return;
         }
         MachineItem machine = new MachineItem(name);
         try {
             Path path = Config.machinesDirectory.resolve(machine.name);
             if (Files.exists(path)) {
-                JOptionPane.showMessageDialog(null, "Machine is already exist", "Machine added", JOptionPane.INFORMATION_MESSAGE);
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Create machine");
+                alert.setHeaderText("Machine is already exist");
+                alert.setContentText("Machine \"" + name + "\" added to list");
+                alert.showAndWait();
             } else {
                 Files.createDirectory(path);
                 Machine instance = Machine.getStandardInstance();
@@ -53,6 +62,15 @@ public class MachineManager {
         }
     }
 
+    public static void deleteMachine(MachineItem machine) {
+        machines.remove(machine);
+        try {
+            Config.saveMachinesConfig();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
     public static List<MachineItem> getMachines() {
         return machines;
     }
@@ -63,12 +81,36 @@ public class MachineManager {
         public String title;
         transient public Machine instance;
         transient public Status status;
-        transient public String desription;
+        transient public String description;
 
         public MachineItem(String title) {
             this.title = title;
             this.name = title.toUpperCase();
             this.status = Status.IDLE;
+        }
+
+        public void start() {
+            if (instance == null) {
+                return;
+            }
+            status = Status.RUN;
+            instance.start();
+        }
+
+        public void reset() {
+            if (instance == null) {
+                return;
+            }
+            status = Status.RUN;
+            instance.reset();
+        }
+
+        public void poweroff() {
+            if (instance == null) {
+                return;
+            }
+            status = Status.IDLE;
+            instance.poweroff();
         }
     }
 
