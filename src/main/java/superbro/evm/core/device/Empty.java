@@ -4,14 +4,7 @@ import superbro.evm.core.Device;
 
 import javax.swing.*;
 
-public class Keyboard extends Device {
-
-    public static class Builder extends DeviceBuilder {
-        @Override
-        public Device create() {
-            return null;
-        }
-    }
+public class Empty extends Device {
 
     @Override
     public void launch() {
@@ -25,6 +18,6 @@ public class Keyboard extends Device {
 
     @Override
     public String getName() {
-        return "Keyboard";
+        return "Empty";
     }
 }

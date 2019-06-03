@@ -1,14 +1,11 @@
 package superbro.evm;
 
-import com.google.gson.annotations.SerializedName;
 import superbro.evm.core.Machine;
 
 import javax.swing.*;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.*;
 
 public class MachineManager {
@@ -45,6 +42,8 @@ public class MachineManager {
                 JOptionPane.showMessageDialog(null, "Machine is already exist", "Machine added", JOptionPane.INFORMATION_MESSAGE);
             } else {
                 Files.createDirectory(path);
+                Machine instance = Machine.getStandardInstance();
+                Machine.saveTo(instance, path.resolve("machine.json"));
             }
             machines.add(machine);
             Config.saveMachinesConfig();
@@ -69,6 +68,7 @@ public class MachineManager {
         public MachineItem(String title) {
             this.title = title;
             this.name = title.toUpperCase();
+            this.status = Status.IDLE;
         }
     }
 

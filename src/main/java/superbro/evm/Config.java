@@ -3,10 +3,11 @@ package superbro.evm;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
+import superbro.evm.core.Machine;
+import superbro.evm.core.Memory;
+import superbro.evm.gui.GUI;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
+import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -22,7 +23,8 @@ public class Config {
             directory = Paths.get(System.getProperty("user.dir")),
             mainConfigPath = directory.resolve("evm.conf.json"),
             machinesConfig = directory.resolve("machines.json"),
-            machinesDirectory = directory.resolve("machines");
+            machinesDirectory = directory.resolve("machines"),
+            systemDirectory = directory.resolve("system");
     private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
     public static void load() {
@@ -32,10 +34,19 @@ public class Config {
             } else {
                 createMainConfig();
             }
-            if(Files.exists(machinesConfig)){
-                loadMachinesConfig();
+            GUI.splahSet("Loading machines", 20);
+            if(Files.exists(systemDirectory)){
+                loadSystemConfig();
             }
             else{
+                createSystemConfig();
+            }
+            if (!Files.exists(machinesDirectory)) {
+                Files.createDirectory(machinesDirectory);
+            }
+            if (Files.exists(machinesConfig)) {
+                loadMachinesConfig();
+            } else {
                 saveMachinesConfig();
             }
             MachineManager.scanMachines();
@@ -75,6 +86,20 @@ public class Config {
         if (mainConfig == null) {
             createMainConfig();
         }
+    }
+
+    private static void createSystemConfig() throws IOException {
+        Files.createDirectory(systemDirectory);
+        InputStream input = Config.class.getResourceAsStream("/superbro/evm/system/std.bios.mem");
+        OutputStream output = Files.newOutputStream(systemDirectory.resolve("std.bios.mem"));
+        Memory.Word bios = new Memory.Word(input);
+        bios.write(output);
+    }
+
+    private static void loadSystemConfig() throws IOException {
+        InputStream in = Files.newInputStream(systemDirectory.resolve("std.bios.mem"));
+        Memory.Word bios = new Memory.Word(in);
+        Machine.setStdBIOS(bios);
     }
 
     static class Main {

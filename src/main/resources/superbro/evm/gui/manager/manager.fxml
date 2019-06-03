@@ -17,19 +17,7 @@
 <?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.201" xmlns:fx="http://javafx.com/fxml/1" fx:controller="superbro.evm.gui.manager.Controller">
-   <top>
-      <ToolBar prefHeight="40.0" prefWidth="600.0" BorderPane.alignment="CENTER">
-        <items>
-          <Button fx:id="btnNew" mnemonicParsing="false" onAction="#btnNewAction" text="New" />
-            <Button fx:id="btnDelete" mnemonicParsing="false" onAction="#btnDeleteAction" text="Delete" />
-            <Button fx:id="btnStart" mnemonicParsing="false" onAction="#btnStartAction" text="Start" />
-            <Button fx:id="btnReset" mnemonicParsing="false" onAction="#btnResetAction" text="Reset" />
-            <Button fx:id="btnPoweroff" alignment="CENTER_RIGHT" mnemonicParsing="false" onAction="#btnPoweroffAction" text="Poweroff" />
-            <Button fx:id="btnIDE" alignment="CENTER_RIGHT" mnemonicParsing="false" onAction="#btnIDE" text="IDE" />
-        </items>
-      </ToolBar>
-   </top>
+<BorderPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="superbro.evm.gui.manager.Controller">
    <center>
       <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
         <tabs>
@@ -124,4 +112,18 @@
    <left>
       <ListView fx:id="mList" prefHeight="200.0" prefWidth="150.0" BorderPane.alignment="CENTER" />
    </left>
+   <top>
+      <ToolBar prefHeight="40.0" BorderPane.alignment="CENTER">
+        <items>
+          <Button fx:id="btnNew" mnemonicParsing="false" onAction="#btnNewAction" text="New" />
+            <Button fx:id="btnDelete" mnemonicParsing="false" onAction="#btnDeleteAction" text="Delete" />
+            <Button fx:id="btnStart" mnemonicParsing="false" onAction="#btnStartAction" text="Start" />
+            <Button fx:id="btnReset" mnemonicParsing="false" onAction="#btnResetAction" text="Reset" />
+            <Button fx:id="btnPoweroff" alignment="CENTER_RIGHT" mnemonicParsing="false" onAction="#btnPoweroffAction" text="Poweroff" />
+            <Pane maxWidth="-Infinity" prefHeight="0.0" prefWidth="10.0" />
+            <Button fx:id="btnIDE" alignment="CENTER_RIGHT" mnemonicParsing="false" onAction="#btnIDE" text="IDE" />
+            <Button fx:id="btnInspector" mnemonicParsing="false" onAction="#btnInspector" text="Inspector" />
+        </items>
+      </ToolBar>
+   </top>
 </BorderPane>

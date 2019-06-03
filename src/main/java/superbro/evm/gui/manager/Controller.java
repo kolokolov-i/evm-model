@@ -6,10 +6,7 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ListCell;
-import javafx.scene.control.ListView;
+import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
@@ -18,10 +15,14 @@ import superbro.evm.MachineManager;
 import superbro.evm.gui.GUI;
 
 import javax.swing.*;
+import java.io.IOException;
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
+
+    private MachineManager.MachineItem selectedMachine;
 
     @FXML
     private Button btnNew;
@@ -35,6 +36,8 @@ public class Controller implements Initializable {
     private Button btnPoweroff;
     @FXML
     private Button btnIDE;
+    @FXML
+    private Button btnInspector;
     @FXML
     private ListView<MachineManager.MachineItem> mList;
     @FXML
@@ -62,16 +65,23 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
+        System.out.println("controller init");
         updateMachinesList();
         mList.setCellFactory(machineListView -> new MachineListViewCell());
         mList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            mName.setText(newValue.title);
+            selectedMachine = newValue;
+            updateViewForMachine();
         });
     }
 
     @FXML
     public void btnNewAction(ActionEvent e) {
-        DialogCreateMachine.run();
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle("Machine creating");
+        dialog.setHeaderText("Enter machine name:");
+        dialog.setContentText("Machine:");
+        Optional<String> result = dialog.showAndWait();
+        result.ifPresent(MachineManager::createMachine);
         updateMachinesList();
     }
 
@@ -100,8 +110,29 @@ public class Controller implements Initializable {
         GUI.showIDE();
     }
 
+    @FXML
+    public void btnInspector(ActionEvent e) {
+        if(selectedMachine == null){
+            return;
+        }
+        superbro.evm.gui.inspector.Controller inspector;
+        try {
+            inspector = GUI.showInspector(selectedMachine);
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+    }
+
     private void updateMachinesList() {
         mList.setItems(FXCollections.observableArrayList(MachineManager.getMachines()));
+    }
+
+    private void updateViewForMachine(){
+        if(selectedMachine==null){
+            mName.setText("");
+            return;
+        }
+        mName.setText(selectedMachine.title);
     }
 
     @FXML

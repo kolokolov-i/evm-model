@@ -8,6 +8,8 @@ public abstract class Device {
 
     public abstract JPanel getOptionsPane();
 
+    public abstract String getName();
+
     public abstract static class DeviceBuilder {
 
         public abstract Device create();

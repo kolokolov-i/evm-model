@@ -22,4 +22,9 @@ public class System extends Device {
     public JPanel getOptionsPane() {
         return null;
     }
+
+    @Override
+    public String getName() {
+        return "System";
+    }
 }
