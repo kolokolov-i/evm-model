@@ -1,0 +1,35 @@
+.motherboard {
+-fx-fill: #5599ff;
+-fx-stroke: #003380;
+-fx-stroke-width: 2;
+}
+
+.cpu {
+-fx-fill: #E6E6E6;
+-fx-stroke: #B3B3B3;
+-fx-stroke-width: 2;
+}
+
+.flash {
+-fx-fill: #FF8080;
+-fx-stroke: #FFD5D5;
+-fx-stroke-width: 2;
+}
+
+.bios {
+-fx-fill: #0055CC;
+-fx-stroke: #AAAAFF;
+-fx-stroke-width: 2;
+}
+
+.memory {
+-fx-fill: #999999;
+-fx-stroke: #E6E6E6;
+-fx-stroke-width: 2;
+}
+
+.device {
+-fx-fill: #87de87;
+-fx-stroke: #37c837;
+-fx-stroke-width: 2;
+}

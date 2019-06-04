@@ -7,7 +7,7 @@ import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.util.Arrays;
 
-public class Memory {
+public class Memory implements Cloneable {
 
     public static class Byte extends Memory implements Cloneable {
         public byte[] data;

@@ -2,6 +2,7 @@ package superbro.evm;
 
 import javafx.scene.control.Alert;
 import superbro.evm.core.Machine;
+import superbro.evm.gui.inspector.Controller;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -82,6 +83,7 @@ public class MachineManager {
         transient public Machine instance;
         transient public Status status;
         transient public String description;
+        transient public Controller inspectorController;
 
         public MachineItem(String title) {
             this.title = title;
@@ -95,6 +97,14 @@ public class MachineManager {
             }
             status = Status.RUN;
             instance.start();
+        }
+
+        public void pause() {
+            if (instance == null) {
+                return;
+            }
+            status = Status.PAUSE;
+            instance.pause();
         }
 
         public void reset() {

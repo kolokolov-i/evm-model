@@ -20,7 +20,11 @@
              <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
                  <Tab text="Code">
                   <content>
-                     <TextArea fx:id="textCode" editable="false" prefHeight="200.0" prefWidth="200.0" />
+                     <BorderPane>
+                        <center>
+                           <TextArea fx:id="textCode" editable="false" prefHeight="200.0" prefWidth="200.0" />
+                        </center>
+                     </BorderPane>
                   </content>
                  </Tab>
                  <Tab text="Data">
@@ -78,8 +82,8 @@
                <GridPane.margin>
                    <Insets />
                </GridPane.margin>
-               <TextField fx:id="tfReg0" editable="false" GridPane.rowIndex="1" />
-               <TextField fx:id="tfReg1" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+               <TextField fx:id="tfReg0" alignment="CENTER" editable="false" GridPane.rowIndex="1" />
+               <TextField fx:id="tfReg1" alignment="CENTER" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                <Label text="R0" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM" />
                <Label text="R1" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM" />
            </GridPane>
@@ -110,8 +114,8 @@
                </GridPane.margin>
                <Label text="R2" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM" />
                <Label text="R3" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM" />
-               <TextField fx:id="tfReg2" editable="false" GridPane.rowIndex="1" />
-               <TextField fx:id="tfReg3" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+               <TextField fx:id="tfReg2" alignment="CENTER" editable="false" GridPane.rowIndex="1" />
+               <TextField fx:id="tfReg3" alignment="CENTER" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
            </GridPane>
            <GridPane GridPane.columnIndex="1" GridPane.rowIndex="2">
                <columnConstraints>
@@ -127,8 +131,8 @@
                </GridPane.margin>
                <Label text="R4" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM" />
                <Label text="R5" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM" />
-               <TextField fx:id="tfReg4" editable="false" GridPane.rowIndex="1" />
-               <TextField fx:id="tfReg5" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+               <TextField fx:id="tfReg4" alignment="CENTER" editable="false" GridPane.rowIndex="1" />
+               <TextField fx:id="tfReg5" alignment="CENTER" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
            </GridPane>
            <GridPane GridPane.columnIndex="1" GridPane.rowIndex="3">
                <columnConstraints>
@@ -144,8 +148,8 @@
                </GridPane.margin>
                <Label text="R6" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM" />
                <Label text="R7" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM" />
-               <TextField fx:id="tfReg6" editable="false" GridPane.rowIndex="1" />
-               <TextField fx:id="tfReg7" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+               <TextField fx:id="tfReg6" alignment="CENTER" editable="false" GridPane.rowIndex="1" />
+               <TextField fx:id="tfReg7" alignment="CENTER" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="1" />
            </GridPane>
            <Label text="RM2" GridPane.halignment="RIGHT" GridPane.rowIndex="2" GridPane.valignment="BOTTOM">
               <GridPane.margin>
@@ -172,22 +176,22 @@
                   <Insets right="5.0" />
               </GridPane.margin>
            </Label>
-           <TextField fx:id="tfRegPC" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="5">
+           <TextField fx:id="tfRegPC" alignment="CENTER" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="5">
               <GridPane.margin>
                   <Insets />
               </GridPane.margin>
            </TextField>
-           <TextField fx:id="tfRegIR" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="6">
+           <TextField fx:id="tfRegIR" alignment="CENTER" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="6">
               <GridPane.margin>
                   <Insets />
               </GridPane.margin>
            </TextField>
-           <TextField fx:id="tfRegSP" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="7">
+           <TextField fx:id="tfRegSP" alignment="CENTER" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="7">
               <GridPane.margin>
                   <Insets />
               </GridPane.margin>
            </TextField>
-           <TextField fx:id="tfRegBP" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="8">
+           <TextField fx:id="tfRegBP" alignment="CENTER" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="8">
               <GridPane.margin>
                   <Insets />
               </GridPane.margin>
@@ -211,11 +215,11 @@
              <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
            </rowConstraints>
             <children>
-               <Label text="0 0 0 I T C O S Z" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM" />
-               <TextField fx:id="tfRegF" editable="false" GridPane.rowIndex="1" />
+               <Label text="0 0 I T C O S Z" GridPane.halignment="CENTER" GridPane.valignment="BOTTOM" />
+               <TextField fx:id="tfRegF" alignment="CENTER" editable="false" GridPane.rowIndex="1" />
             </children>
          </GridPane>
-         <TextField fx:id="tfRegI" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+         <TextField fx:id="tfRegI" alignment="CENTER" editable="false" GridPane.columnIndex="1" GridPane.rowIndex="10" />
          <Label text="RI" GridPane.halignment="RIGHT" GridPane.rowIndex="10" GridPane.valignment="CENTER">
             <GridPane.margin>
                <Insets right="5.0" />

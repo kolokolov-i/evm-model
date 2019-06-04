@@ -27,6 +27,8 @@ public class Controller implements Initializable {
     @FXML
     private Button btnStart;
     @FXML
+    private Button btnPause;
+    @FXML
     private Button btnReset;
     @FXML
     private Button btnPoweroff;
@@ -108,6 +110,18 @@ public class Controller implements Initializable {
     }
 
     @FXML
+    public void btnPauseAction(ActionEvent e) {
+        if (selectedMachine == null) {
+            return;
+        }
+        selectedMachine.pause();
+        updateMachinesList();
+        if(selectedMachine.inspectorController!=null) {
+            selectedMachine.inspectorController.updateView();
+        }
+    }
+
+    @FXML
     public void btnResetAction(ActionEvent e) {
         if (selectedMachine == null) {
             return;
@@ -135,7 +149,6 @@ public class Controller implements Initializable {
         if (selectedMachine == null) {
             return;
         }
-        //superbro.evm.gui.inspector.Controller inspector;
         try {
             GUI.showInspector(selectedMachine);
         } catch (IOException ex) {

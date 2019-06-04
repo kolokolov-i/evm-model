@@ -16,12 +16,12 @@ public class Machine {
 
     private Device[] devices;
     private boolean[] devAutostart;
-    private Memory.Byte
+    public Memory.Byte
             memoryData, memoryStack;
-    private Memory.Word
+    public Memory.Word
             memoryBIOS, memoryCode;
     private String modelBIOS;
-    private CPU cpu;
+    public CPU cpu;
     private MachineThread machineThread;
 
     private static Memory.Word stdBIOS;

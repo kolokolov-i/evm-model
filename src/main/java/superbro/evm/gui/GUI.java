@@ -3,9 +3,9 @@ package superbro.evm.gui;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import superbro.evm.MachineManager;
-import superbro.evm.Main;
 import superbro.evm.gui.manager.Controller;
 
 import javax.swing.*;
@@ -57,6 +57,7 @@ public class GUI {
 
     private static void loadManagerStage(Stage primaryStage) throws IOException {
         managerStage = primaryStage;
+        primaryStage.getIcons().add(new Image("/superbro/evm/gui/evm.png"));
         FXMLLoader fxmlLoader = new FXMLLoader(GUI.class.getResource("/superbro/evm/gui/manager/manager.fxml"));
         Parent root = fxmlLoader.load();
         managerController = fxmlLoader.getController();
@@ -73,20 +74,25 @@ public class GUI {
         ideStage.setScene(new Scene(root, 640, 480));
     }
 
-    public static superbro.evm.gui.inspector.Controller showInspector(MachineManager.MachineItem machine) throws IOException {
+    public static void showInspector(MachineManager.MachineItem machine) throws IOException {
         if(machine == null){
             throw new IllegalArgumentException();
+        }
+        if(machine.inspectorController!=null){
+            machine.inspectorController.stage.show();
+            return;
         }
         URL resource = GUI.class.getResource("/superbro/evm/gui/inspector/inspector.fxml");
         FXMLLoader fxmlLoader = new FXMLLoader(resource);
         Parent root = fxmlLoader.load();
         superbro.evm.gui.inspector.Controller inspectorController = fxmlLoader.getController();
         inspectorController.setMachine(machine);
+        machine.inspectorController = inspectorController;
         Stage stage = new Stage();
         stage.setTitle("Inspector");
         stage.setScene(new Scene(root, 640, 480));
+        inspectorController.stage = stage;
         stage.show();
-        return inspectorController;
     }
 
     public static Controller getManagerController() {
