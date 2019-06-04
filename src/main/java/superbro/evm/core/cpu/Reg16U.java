@@ -9,4 +9,7 @@ public class Reg16U extends Reg {
         rL = b;
     }
 
+    public short getValue(){
+        return (short) ((rH.value << 8) | rL.value);
+    }
 }

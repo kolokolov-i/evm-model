@@ -57,7 +57,7 @@ public class GUI {
 
     private static void loadManagerStage(Stage primaryStage) throws IOException {
         managerStage = primaryStage;
-        primaryStage.getIcons().add(new Image("/superbro/evm/gui/evm.png"));
+        //primaryStage.getIcons().add(new Image("/superbro/evm/gui/evm.png"));
         FXMLLoader fxmlLoader = new FXMLLoader(GUI.class.getResource("/superbro/evm/gui/manager/manager.fxml"));
         Parent root = fxmlLoader.load();
         managerController = fxmlLoader.getController();

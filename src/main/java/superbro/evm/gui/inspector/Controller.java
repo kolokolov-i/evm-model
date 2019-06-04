@@ -105,7 +105,7 @@ public class Controller implements Initializable {
         s = "";
         int i, j, k = 0;
         short[] data = machine.memoryCode.data;
-        for (int iPage = 0; iPage < 256; iPage++) {
+        for (int iPage = 0; iPage < 1; iPage++) {
             s += "\tPage #" + iPage + "\n";
             for (i = 0; i < 16; i++) {
                 for (j = 0; j < 16; j++) {
@@ -115,5 +115,31 @@ public class Controller implements Initializable {
             }
         }
         textCode.setText(s);
+        s = "";
+        k = 0;
+        byte[] bb = machine.memoryData.data;
+        for (int iPage = 0; iPage < 1; iPage++) {
+            s += "\tPage #" + iPage + "\n";
+            for (i = 0; i < 16; i++) {
+                for (j = 0; j < 16; j++) {
+                    s += String.format("%02X ", bb[k++]);
+                }
+                s += "\n";
+            }
+        }
+        textData.setText(s);
+        s = "";
+        k = 0;
+        bb = machine.memoryStack.data;
+        for (int iPage = 0; iPage < 1; iPage++) {
+            s += "\tPage #" + iPage + "\n";
+            for (i = 0; i < 16; i++) {
+                for (j = 0; j < 16; j++) {
+                    s += String.format("%02X ", bb[k++]);
+                }
+                s += "\n";
+            }
+        }
+        textStack.setText(s);
     }
 }

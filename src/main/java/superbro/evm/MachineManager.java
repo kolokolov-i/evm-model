@@ -52,8 +52,8 @@ public class MachineManager {
                 alert.showAndWait();
             } else {
                 Files.createDirectory(path);
-                Machine instance = Machine.getStandardInstance();
-                Machine.saveTo(instance, path.resolve("machine.json"));
+                machine.instance = Machine.getStandardInstance();
+                Machine.saveTo(machine.instance, path);
             }
             machines.add(machine);
             Config.saveMachinesConfig();
@@ -121,6 +121,11 @@ public class MachineManager {
             }
             status = Status.IDLE;
             instance.poweroff();
+            try {
+                Machine.saveTo(instance, Config.machinesDirectory.resolve(name));
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 

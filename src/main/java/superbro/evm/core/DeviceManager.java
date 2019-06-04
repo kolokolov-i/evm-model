@@ -1,6 +1,6 @@
 package superbro.evm.core;
 
-import superbro.evm.core.device.Keyboard;
+import superbro.evm.core.device.*;
 import superbro.evm.core.device.System;
 
 import java.util.HashMap;
@@ -14,6 +14,7 @@ public class DeviceManager {
         builders = new HashMap<>();
         builders.put("System", new System.Builder());
         builders.put("Keyboard", new Keyboard.Builder());
+        builders.put("Empty", new Empty.Builder());
     }
 
     static Device get(String type) {

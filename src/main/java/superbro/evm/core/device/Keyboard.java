@@ -9,8 +9,11 @@ public class Keyboard extends Device {
     public static class Builder extends DeviceBuilder {
         @Override
         public Device create() {
-            return null;
+            return new Keyboard();
         }
+    }
+
+    public Keyboard() {
     }
 
     @Override

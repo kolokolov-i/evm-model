@@ -9,8 +9,11 @@ public class System extends Device {
     public static class Builder extends DeviceBuilder {
         @Override
         public Device create() {
-            return null;
+            return new System();
         }
+    }
+
+    public System() {
     }
 
     @Override

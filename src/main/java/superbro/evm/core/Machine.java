@@ -7,6 +7,7 @@ import superbro.evm.core.device.Empty;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -61,9 +62,20 @@ public class Machine {
     }
 
     public static void saveTo(Machine machine, Path path) throws IOException {
-        BufferedWriter writer = Files.newBufferedWriter(path, StandardOpenOption.CREATE);
+        BufferedWriter writer = Files.newBufferedWriter(path.resolve("machine.json"),
+                StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         gson.toJson(machine, writer);
         writer.close();
+        OutputStream out;
+        out = Files.newOutputStream(path.resolve("code.mem"), StandardOpenOption.CREATE);
+        machine.memoryCode.write(out);
+        out.close();
+        out = Files.newOutputStream(path.resolve("data.mem"), StandardOpenOption.CREATE);
+        machine.memoryData.write(out);
+        out.close();
+        out = Files.newOutputStream(path.resolve("stack.mem"), StandardOpenOption.CREATE);
+        machine.memoryStack.write(out);
+        out.close();
     }
 
     public static Machine getStandardInstance() {

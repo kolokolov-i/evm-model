@@ -2,9 +2,6 @@ package superbro.evm.core;
 
 import superbro.evm.core.cpu.*;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class CPU {
 
     private Machine machine;
@@ -43,10 +40,62 @@ public class CPU {
     public void execute(short command) {
         Executor exe = parse(command);
         exe.execute(this, command);
+        System.out.printf("%04X\n",command);
+    }
+
+    public void pushToStack(short v) {
+        int sp = 0 | SP.value;
+        if (sp <= 0x0001) {
+            // TODO interrupt Stack Overflow
+        }
+        machine.memoryStack.data[sp] = (byte) (v >> 8);
+        machine.memoryStack.data[sp + 1] = (byte) (v);
+        SP.value = (short) (sp - 2);
+    }
+
+    public void pushToStack(byte v) {
+        int sp = 0 | SP.value;
+        if (sp == 0x0000) {
+            // TODO interrupt Stack Overflow
+        }
+        machine.memoryStack.data[sp] = v;
+        SP.value = (short) (sp - 1);
+    }
+
+    public short pop16FromStack() {
+        int sp = 0 | SP.value;
+        if (sp >= 0xFFFE) {
+            // TODO interrupt Stack empty
+        }
+        short r;
+        r = machine.memoryStack.data[sp];
+        r |= machine.memoryStack.data[sp - 1] << 8;
+        SP.value += 2;
+        return r;
+    }
+    public byte pop8FromStack() {
+        int sp = 0 | SP.value;
+        if (sp == 0xFFFF) {
+            // TODO interrupt Stack empty
+        }
+        byte r;
+        r = machine.memoryStack.data[sp];
+        SP.value += 1;
+        return r;
+    }
+
+    public void interrupt(int n){
+        boolean f = false;
+        // TODO check RI
+        if(!f){
+            PC.value++;
+            return;
+        }
+        pushToStack(PC.value);
+        pushToStack(RF.value);
     }
 
     private Executor parse(short command) {
-        System.out.printf("execute %X\n", command);
         Executor result = Executor.NOP;
         int h1 = (command & 0xf000) >> 12;
         switch (h1) {
@@ -62,20 +111,56 @@ public class CPU {
 
     private Executor parseX0(short command) {
         Executor result = Executor.NOP;
-        int h2 = (command & 0x0f00) >> 8;
-        int h3 = (command & 0x00f0) >> 4;
+        int h2 = (command >> 8) & 0x0f;
+        int h3 = (command >> 4) & 0x0f;
         switch (h2) {
             case 0:
-                result = Executor.NOP;
-                break;
+                return Executor.NOP;
             case 1:
                 switch (h3) {
                     case 4:
-                        //result = Executor.CALL;
+                        return Executor.CALL;
+                    case 5:
+                        return Executor.RET;
+                    case 6:
+                        return Executor.INT;
+                    case 7:
+                        return Executor.IRET;
+                    case 8:
+                        return Executor.JUMP;
                 }
                 break;
             case 2:
+                return Executor.RCALL;
+            case 3:
+                return Executor.RETN;
+            case 4:
+                return Executor.RJUMP;
+            case 5:
+                return Executor.CMPr8;
+            case 6:
+                return Executor.CMPr16;
+            case 7:
+                switch (h3) {
+                    case 4:
+                        return Executor.TSTr8;
+                    case 5:
+                        return Executor.TSTr16;
+                    case 0:
+                        return Executor.FS;
+                    case 1:
+                        return Executor.FC;
+                }
                 break;
+            case 8:
+            case 9:
+            case 10:
+            case 11:
+            case 12:
+            case 13:
+            case 14:
+            case 15:
+                return Executor.JMPF;
         }
         return result;
     }

@@ -6,6 +6,16 @@ import javax.swing.*;
 
 public class Empty extends Device {
 
+    public static class Builder extends DeviceBuilder {
+        @Override
+        public Device create() {
+            return new Empty();
+        }
+    }
+
+    public Empty() {
+    }
+
     @Override
     public void launch() {
 
