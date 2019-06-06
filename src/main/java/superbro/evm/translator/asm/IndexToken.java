@@ -13,4 +13,11 @@ class IndexToken extends Token {
     void plus(Token tok) {
         slave = tok;
     }
+
+    @Override
+    public String toString() {
+        return slave==null ?
+                String.format("[%s]", master.toString()) :
+                String.format("[%s+%s]", master.toString(), slave.toString());
+    }
 }

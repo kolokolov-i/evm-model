@@ -123,6 +123,26 @@ public class Machine {
         machineThread.start();
     }
 
+    public void uploadCode(int page, short[] src){
+        int i = page*256;
+        if(i>65536){
+            return;
+        }
+        for(int j =0; j<src.length; i++, j++){
+            memoryCode.data[i] = src[j];
+        }
+    }
+
+    public void uploadData(int page, byte[] src){
+        int i = page*256;
+        if(i>65536){
+            return;
+        }
+        for(int j =0; j<src.length; i++, j++){
+            memoryData.data[i] = src[j];
+        }
+    }
+
     private static Gson gson = new GsonBuilder()
             .setPrettyPrinting()
             .registerTypeAdapter(Machine.class, new MachineDeserializer())

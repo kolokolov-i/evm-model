@@ -89,7 +89,7 @@ public class GUI {
         inspectorController.setMachine(machine);
         machine.inspectorController = inspectorController;
         Stage stage = new Stage();
-        stage.setTitle("Inspector");
+        stage.setTitle(machine.title + " Inspector");
         stage.setScene(new Scene(root, 640, 480));
         inspectorController.stage = stage;
         stage.show();

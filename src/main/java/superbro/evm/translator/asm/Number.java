@@ -8,4 +8,9 @@ class Number extends Token {
         super(Tag.NUMBER, n, c);
         value = v;
     }
+
+    @Override
+    public String toString() {
+        return String.format("0x%X", value);
+    }
 }

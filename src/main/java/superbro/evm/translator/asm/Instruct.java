@@ -114,6 +114,7 @@ class Instruct {
     int line;
     int offset;
     private Command command;
+    private Word opcode;
     private Token argument1, argument2;
 
     Instruct(Word label, Word name, Token arg1, Token arg2) throws ParserException {
@@ -130,16 +131,32 @@ class Instruct {
             }
             labels.put(s, new Label(label, this));
         }
+        opcode = name;
         argument1 = arg1;
         argument2 = arg2;
     }
 
-    public static void generate(List<Instruct> instructs, ArrayList<Short> raw, Messager messager) {
+    public static void generate(List<Instruct> instructs, ArrayList<Short> raw, StringBuilder listiner, Messager messager) {
         Instruct.instructs = instructs;
         calculateOffsets();
+        int i = 0;
         for (Instruct j : instructs) {
             try {
                 j.generate(raw);
+                int tt = j.command.getSize(j.argument1, j.argument2);
+                listiner.append(String.format("%04X\t%s\t", raw.get(i), j.opcode.toString()));
+                if(j.argument1!=null){
+                    listiner.append(j.argument1.toString());
+                    if(j.argument2!=null){
+                        listiner.append(",\t");
+                        listiner.append(j.argument2.toString());
+                    }
+                }
+                listiner.append('\n');
+                for(int n=1; n<tt; n++){
+                    listiner.append(String.format("%04X", raw.get(i+n)));
+                }
+                i+=tt;
             } catch (ParserException ex) {
                 switch(ex.type){
                     case ERROR:

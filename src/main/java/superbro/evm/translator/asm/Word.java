@@ -8,4 +8,9 @@ class Word extends Token {
         super(tag, n, c);
         lexeme = s;
     }
+
+    @Override
+    public String toString() {
+        return lexeme;
+    }
 }

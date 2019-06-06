@@ -18,7 +18,7 @@ import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
 
-    private MachineManager.MachineItem selectedMachine;
+    public MachineManager.MachineItem selectedMachine;
 
     @FXML
     private Button btnNew;

@@ -1,6 +1,5 @@
 package superbro.evm.translator.asm;
 
-import superbro.evm.translator.MessageRecord;
 import superbro.evm.translator.Translator;
 
 import java.util.ArrayList;
@@ -28,7 +27,7 @@ public class AsmTranslator extends Translator {
     private void translateCode() {
         Lexer lexer = new Lexer(sourceCode, messager);
         success = lexer.scan();
-        if(!success){
+        if (!success) {
             return;
         }
         List<Token> tokens = lexer.getResult();
@@ -37,16 +36,21 @@ public class AsmTranslator extends Translator {
         Instruct.reset(dTranslator.vars);
         Syntaxer syntaxer = new Syntaxer(tokens, messager);
         success = syntaxer.parse();
-        if(!success){
+        if (!success) {
             return;
         }
         List<Instruct> instructs = syntaxer.getResult();
         ArrayList<Short> raw = new ArrayList<>(1000);
-        Instruct.generate(instructs, raw, messager);
-        StringBuilder listingBuilder = new StringBuilder();
-        for(Short t : raw){
-            listingBuilder.append(String.format("%04x\n", t));
+        StringBuilder listiner = new StringBuilder();
+        Instruct.generate(instructs, raw, listiner, messager);
+//        for(Short t : raw){
+//            listiner.append(String.format("%04x\n", t));
+//        }
+        rawCode = new short[raw.size()];
+        int[] ints = raw.stream().mapToInt(t -> t).toArray();
+        for(int i = 0; i<ints.length; i++){
+            rawCode[i] = (short) ints[i];
         }
-        listingCode = listingBuilder.toString();
+        listingCode = listiner.toString();
     }
 }

@@ -1,17 +1,19 @@
 package superbro.evm.gui.ide;
 
+import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.Accordion;
-import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TitledPane;
-import superbro.evm.translator.MessageRecord;
+import javafx.scene.control.*;
+import superbro.evm.MachineManager;
+import superbro.evm.core.Machine;
+import superbro.evm.gui.GUI;
 import superbro.evm.translator.Translator;
 import superbro.evm.translator.asm.AsmTranslator;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
 import java.util.stream.Collectors;
 
@@ -31,10 +33,40 @@ public class Controller implements Initializable {
     Accordion messageAccordion;
     @FXML
     TitledPane messagePane;
+    @FXML
+    ComboBox<Integer> pageList;
+    @FXML
+    Button btnUpload;
+
+    short[] code;
+    byte[] data;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        List<Integer> list = new ArrayList<>();
+        for(int i = 0; i<256; i++){
+            list.add(i);
+        }
+        pageList.getItems().addAll(FXCollections.observableList(list));
+        pageList.setValue(0);
+        code = null;
+        data = null;
+    }
 
+    @FXML
+    public void uploadProgramm(){
+        MachineManager.MachineItem selectedMachine = GUI.getManagerController().selectedMachine;
+        if(selectedMachine==null){
+            return;
+        }
+        Machine machine = selectedMachine.instance;
+        if(machine==null){
+            return;
+        }
+        if(code == null){
+            return;
+        }
+        machine.uploadCode(pageList.getValue(), code);
     }
 
     @FXML
@@ -57,6 +89,8 @@ public class Controller implements Initializable {
     public void btnActionTranslate(ActionEvent e){
         String srcCode = textCode.getText();
         String srcData = textData.getText();
+        code = null;
+        data = null;
         Translator trans = new AsmTranslator(srcCode, srcData);
         boolean success = trans.translate();
         messageList.getItems().clear();
@@ -68,6 +102,8 @@ public class Controller implements Initializable {
                         .collect(Collectors.toList()));
         binCode.setText(trans.getListingCode());
         binData.setText(trans.getListingData());
+        code = trans.getRawCode();
+        data = null;
         if(!messageList.getItems().isEmpty()){
             messageAccordion.setExpandedPane(messagePane);
         }

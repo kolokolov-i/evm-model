@@ -5,7 +5,8 @@ public abstract class Translator {
     protected String sourceCode, sourceData;
     protected Messager messager;
     protected String listingCode, listingData;
-    protected byte[] rawCode, rawData;
+    protected short[] rawCode;
+    protected byte[] rawData;
 
     public Translator() {
     }
@@ -38,7 +39,7 @@ public abstract class Translator {
         return listingData;
     }
 
-    public byte[] getRawCode() {
+    public short[] getRawCode() {
         return rawCode;
     }
 
