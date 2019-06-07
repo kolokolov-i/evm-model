@@ -33,7 +33,7 @@ class Instruct {
         commandMap.put("JMPNC", new RJMPNC());
         commandMap.put("JMPNO", new RJMPNO());
         commandMap.put("CMP", new CMP());
-        commandMap.put("CMPI", new CMPI());
+        commandMap.put("CMPi", new CMPI());
         commandMap.put("TST", new TST());
         commandMap.put("FSZ", new FXX(true, 1));
         commandMap.put("FSS", new FXX(true, 2));

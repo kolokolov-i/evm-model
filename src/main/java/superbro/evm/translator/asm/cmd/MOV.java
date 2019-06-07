@@ -26,8 +26,8 @@ public class MOV extends Command {
             else if(arg2.type == Type.NUMBER){
                 Argument.Reg16 a1 = (Argument.Reg16)arg1;
                 Argument.Number a2 = (Argument.Number) arg2;
-                rr.add(Code.gen_R8_N(0x8800, a1.rL, a2.value>>8));
-                rr.add(Code.gen_R8_N(0x8800, a1.rH, a2.value));
+                rr.add(Code.gen_R8_N(0x8800, a1.rH, a2.value>>8));
+                rr.add(Code.gen_R8_N(0x8800, a1.rL, a2.value));
                 return;
             }
         } else {

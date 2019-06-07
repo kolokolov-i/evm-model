@@ -12,4 +12,9 @@ public class Reg16U extends Reg {
     public short getValue(){
         return (short) ((rH.value << 8) | rL.value);
     }
+
+    public void setValue(int n){
+        rH.value = (byte) (n>>8);
+        rL.value = (byte) n;
+    }
 }

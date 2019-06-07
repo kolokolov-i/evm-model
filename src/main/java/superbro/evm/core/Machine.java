@@ -15,7 +15,7 @@ import java.nio.file.StandardOpenOption;
 
 public class Machine {
 
-    private Device[] devices;
+    public Device[] devices;
     private boolean[] devAutostart;
     public Memory.Byte
             memoryData, memoryStack;

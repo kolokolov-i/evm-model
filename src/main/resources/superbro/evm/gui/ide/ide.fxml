@@ -77,7 +77,7 @@
                   </Tab>
                 <Tab text="Text Data">
                      <content>
-                        <TextArea fx:id="textData" prefHeight="200.0" prefWidth="200.0" />
+                        <TextArea fx:id="textData" prefHeight="200.0" prefWidth="200.0" styleClass="code" />
                      </content>
                   </Tab>
               </tabs>

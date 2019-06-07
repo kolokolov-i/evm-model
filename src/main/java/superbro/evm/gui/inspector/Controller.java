@@ -1,19 +1,27 @@
 package superbro.evm.gui.inspector;
 
+import com.sun.javafx.scene.control.skin.TableHeaderRow;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
-import javafx.scene.control.ChoiceBox;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.stage.Stage;
 import superbro.evm.MachineManager;
 import superbro.evm.core.CPU;
 import superbro.evm.core.Machine;
+import superbro.evm.core.cpu.Reg8;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -64,7 +72,24 @@ public class Controller implements Initializable {
     @FXML
     private ComboBox<Integer> pageListStack;
 
+    @FXML
+    private TableView<PortsInfo> tablePorts;
+    @FXML
+    private TableColumn<PortsInfo, Integer> columnP0;
+    @FXML
+    private TableColumn<PortsInfo, Integer> columnP1;
+    @FXML
+    private TableColumn<PortsInfo, Integer> columnP2;
+    @FXML
+    private TableColumn<PortsInfo, Integer> columnP3;
+    @FXML
+    private TableColumn<PortsInfo, String> columnDevice;
+
+    @FXML
+    private ListView interrupts;
+
     private Machine machine;
+    private ObservableList<PortsInfo> portsData = FXCollections.observableArrayList();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -77,11 +102,24 @@ public class Controller implements Initializable {
         pageListStack.getItems().addAll(FXCollections.observableList(list));
         pageListCode.setValue(0);
         pageListData.setValue(0);
-        pageListStack.setValue(0);
+        pageListStack.setValue(255);
+
+        columnP0.setCellValueFactory(t -> t.getValue().p0Property().asObject());
+        columnP1.setCellValueFactory(t -> t.getValue().p1Property().asObject());
+        columnP2.setCellValueFactory(t -> t.getValue().p2Property().asObject());
+        columnP3.setCellValueFactory(t -> t.getValue().p3Property().asObject());
+        columnDevice.setCellValueFactory(t -> t.getValue().deviceProperty());
+        tablePorts.setItems(portsData);
     }
 
     public void setMachine(MachineManager.MachineItem machine) {
         this.machine = machine.instance;
+        Reg8[] ports = machine.instance.cpu.ports;
+        for(int i = 0; i< 8; i++){
+            portsData.add(new PortsInfo(
+                    ports[4*i], ports[4*i+1], ports[4*i+2], ports[4*i+3],
+                    machine.instance.devices[i].getName()));
+        }
         updateView();
     }
 
@@ -122,6 +160,10 @@ public class Controller implements Initializable {
         updateHexCode();
         updateHexData();
         updateHexStack();
+        interrupts.getItems().clear();
+        for(int i = 0; i<16; i++){
+            interrupts.getItems().add(cpu.interrupts[i].value);
+        }
     }
 
     @FXML
@@ -170,5 +212,61 @@ public class Controller implements Initializable {
             s += "\n";
         }
         return s;
+    }
+
+    private class PortsInfo {
+        private IntegerProperty p0;
+        private IntegerProperty p1;
+        private IntegerProperty p2;
+        private IntegerProperty p3;
+        private StringProperty device;
+
+        public PortsInfo(Reg8 p0, Reg8 p1, Reg8 p2, Reg8 p3, String device) {
+            this.p0 = new SimpleIntegerProperty(p0.value);
+            this.p1 = new SimpleIntegerProperty(p1.value);
+            this.p2 = new SimpleIntegerProperty(p2.value);
+            this.p3 = new SimpleIntegerProperty(p3.value);
+            this.device = new SimpleStringProperty(device);
+        }
+
+        public int getP0() {
+            return p0.get();
+        }
+
+        public IntegerProperty p0Property() {
+            return p0;
+        }
+
+        public int getP1() {
+            return p1.get();
+        }
+
+        public IntegerProperty p1Property() {
+            return p1;
+        }
+
+        public int getP2() {
+            return p2.get();
+        }
+
+        public IntegerProperty p2Property() {
+            return p2;
+        }
+
+        public int getP3() {
+            return p3.get();
+        }
+
+        public IntegerProperty p3Property() {
+            return p3;
+        }
+
+        public String getDevice() {
+            return device.get();
+        }
+
+        public StringProperty deviceProperty() {
+            return device;
+        }
     }
 }
