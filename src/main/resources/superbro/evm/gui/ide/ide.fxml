@@ -96,13 +96,13 @@
       </BorderPane>
    </center>
    <right>
-      <BorderPane prefHeight="200.0" prefWidth="260.0" BorderPane.alignment="CENTER">
+      <BorderPane prefHeight="200.0" prefWidth="250.0" BorderPane.alignment="CENTER">
          <center>
             <TabPane prefHeight="200.0" prefWidth="200.0" tabClosingPolicy="UNAVAILABLE" BorderPane.alignment="CENTER">
               <tabs>
                 <Tab text="Binary Code">
                      <content>
-                        <TextArea fx:id="binCode" prefHeight="238.0" prefWidth="200.0" styleClass="code" />
+                        <TextArea fx:id="binCode" editable="false" prefHeight="238.0" prefWidth="200.0" styleClass="code" />
                      </content>
                 </Tab>
                 <Tab text="Binary Data">

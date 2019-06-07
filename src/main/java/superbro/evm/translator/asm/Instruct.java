@@ -35,18 +35,18 @@ class Instruct {
         commandMap.put("CMP", new CMP());
         commandMap.put("CMPI", new CMPI());
         commandMap.put("TST", new TST());
-        commandMap.put("FSZ", new FSZ());
-        commandMap.put("FSS", new FSS());
-        commandMap.put("FSC", new FSC());
-        commandMap.put("FSO", new FSO());
-        commandMap.put("FST", new FST());
-        commandMap.put("FSI", new FSI());
-        commandMap.put("FCZ", new FCZ());
-        commandMap.put("FCS", new FCS());
-        commandMap.put("FCC", new FCC());
-        commandMap.put("FCO", new FCO());
-        commandMap.put("FCT", new FCT());
-        commandMap.put("FCI", new FCI());
+        commandMap.put("FSZ", new FXX(true, 1));
+        commandMap.put("FSS", new FXX(true, 2));
+        commandMap.put("FXX", new FXX(true, 3));
+        commandMap.put("FSO", new FXX(true, 4));
+        commandMap.put("FST", new FXX(true, 5));
+        commandMap.put("FSI", new FXX(true, 6));
+        commandMap.put("FCZ", new FXX(false, 1));
+        commandMap.put("FCS", new FXX(false, 2));
+        commandMap.put("FCC", new FXX(false, 3));
+        commandMap.put("FCO", new FXX(false, 4));
+        commandMap.put("FCT", new FXX(false, 5));
+        commandMap.put("FCI", new FXX(false, 6));
         commandMap.put("AND", new AND());
         commandMap.put("ANDI", new ANDI());
         commandMap.put("OR", new OR());
@@ -94,11 +94,13 @@ class Instruct {
 
     static {
         words = new HashMap<>();
+        Argument.Reg8[] rr8 = new Argument.Reg8[8];
         for (int i = 0; i < 8; i++) {
-            words.put("R" + i, new Argument.Reg8(i));
+            rr8[i] =  new Argument.Reg8(i);
+            words.put("R" + i, rr8[i]);
         }
         for (int i = 0; i < 4; i++) {
-            words.put("RM" + i, new Argument.Reg16(i));
+            words.put("RM"+i, new Argument.Reg16(0, rr8[2*i], rr8[2*i+1]));
         }
         for (int i = 0; i < 32; i++) {
             words.put("P" + i, new Argument.Port(i));
@@ -111,11 +113,11 @@ class Instruct {
         vars = v;
     }
 
-    int line;
-    int offset;
+    int line, offset, size;
     private Command command;
+    private Argument argument1, argument2;
     private Word opcode;
-    private Token argument1, argument2;
+    private Token arg1Token, arg2Token;
 
     Instruct(Word label, Word name, Token arg1, Token arg2) throws ParserException {
         line = name.line;
@@ -132,8 +134,11 @@ class Instruct {
             labels.put(s, new Label(label, this));
         }
         opcode = name;
-        argument1 = arg1;
-        argument2 = arg2;
+        arg1Token = arg1;
+        arg2Token = arg2;
+        argument1 = resoluteArgument(arg1Token);
+        argument2 = resoluteArgument(arg2Token);
+        size = command.getSize(argument1, argument2);
     }
 
     public static void generate(List<Instruct> instructs, ArrayList<Short> raw, StringBuilder listiner, Messager messager) {
@@ -143,18 +148,18 @@ class Instruct {
         for (Instruct j : instructs) {
             try {
                 j.generate(raw);
-                int tt = j.command.getSize(j.argument1, j.argument2);
-                listiner.append(String.format("%04X\t%s\t", raw.get(i), j.opcode.toString()));
-                if(j.argument1!=null){
-                    listiner.append(j.argument1.toString());
-                    if(j.argument2!=null){
-                        listiner.append(",\t");
-                        listiner.append(j.argument2.toString());
+                int tt = j.size;
+                listiner.append(String.format("%04X : %04X : %s ", j.offset, raw.get(i), j.opcode.toString()));
+                if(j.arg1Token !=null){
+                    listiner.append(j.arg1Token.toString());
+                    if(j.arg2Token !=null){
+                        listiner.append(", ");
+                        listiner.append(j.arg2Token.toString());
                     }
                 }
                 listiner.append('\n');
                 for(int n=1; n<tt; n++){
-                    listiner.append(String.format("%04X", raw.get(i+n)));
+                    listiner.append(String.format("%04X : %04X\n", j.offset+n, raw.get(i+n)));
                 }
                 i+=tt;
             } catch (ParserException ex) {
@@ -173,14 +178,12 @@ class Instruct {
         int t = 0;
         for (Instruct ins : instructs) {
             ins.offset = t;
-            t += ins.command.getSize(ins.argument1, ins.argument2);
+            t += ins.size;
         }
     }
 
-    private void generate(ArrayList<Short> r) throws ParserException {
-        Argument arg1 = resoluteArgument(argument1);
-        Argument arg2 = resoluteArgument(argument2);
-        this.command.generate(r, arg1, arg2);
+    private void generate(List<Short> raw) throws ParserException {
+        command.generate(raw, argument1, argument2);
     }
 
     private Argument resoluteArgument(Token token) throws ParserException {

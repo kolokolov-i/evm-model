@@ -20,7 +20,7 @@ public class PUT extends Command {
     }
 
     @Override
-    public int getSize(Token arg1, Token arg2) {
+    public int getSize(Argument arg1, Argument arg2) {
         return 1;
     }
 }

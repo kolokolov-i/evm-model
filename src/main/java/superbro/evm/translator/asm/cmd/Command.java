@@ -10,5 +10,5 @@ public abstract class Command {
 
     public abstract void generate(List<Short> rr, Argument arg1, Argument arg2) throws ParserException;
 
-    public abstract int getSize(Token arg1, Token arg2);
+    public abstract int getSize(Argument arg1, Argument arg2);
 }

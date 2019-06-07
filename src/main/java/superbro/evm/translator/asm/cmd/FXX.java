@@ -7,17 +7,27 @@ import superbro.evm.translator.asm.Type;
 
 import java.util.List;
 
-public class FCT extends Command {
+public class FXX extends Command {
+
+    boolean setter;
+    int flag;
+
+    public FXX(boolean setter, int flag) {
+        this.setter = setter;
+        this.flag = flag;
+    }
+
     @Override
     public void generate(List<Short> rr, Argument arg1, Argument arg2) throws ParserException {
-        rr.add((short) 0x0715);
+        int r = setter ? 0x0700 : 0x0710;
+        rr.add((short) (r + flag));
         if (arg1.type != Type.NONE) {
             throw ParserException.redundantArgument();
         }
     }
 
     @Override
-    public int getSize(Token arg1, Token arg2) {
+    public int getSize(Argument arg1, Argument arg2) {
         return 1;
     }
 }

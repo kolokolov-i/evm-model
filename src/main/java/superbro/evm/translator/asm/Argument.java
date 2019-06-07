@@ -29,9 +29,12 @@ public class Argument {
 
     public static class Reg16 extends Argument {
         public int value;
-        Reg16(int index){
+        public Reg8 rH, rL;
+        Reg16(int index, Reg8 hH, Reg8 hL){
             super(Type.REG16);
             value = index;
+            rH = hH;
+            rL = hL;
         }
     }
 
