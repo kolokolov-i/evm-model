@@ -363,7 +363,7 @@ public abstract class Executor {
                             case 1:
                                 r1 = Code.extRM(com, 4);
                                 r2 = Code.extRM(com, 0);
-                                cpu.regs8[r1].value += cpu.regs8[r2].value;
+                                cpu.regs16[r1].setValue(cpu.regs16[r1].getValue() + cpu.regs16[r2].getValue());
                                 break;
                             case 2:
                                 r1 = Code.extR8(com, 0);
@@ -400,7 +400,7 @@ public abstract class Executor {
                             case 1:
                                 r1 = Code.extRM(com, 4);
                                 r2 = Code.extRM(com, 0);
-                                cpu.regs8[r1].value -= cpu.regs8[r2].value;
+                                cpu.regs16[r1].setValue(cpu.regs16[r1].getValue() - cpu.regs16[r2].getValue());
                                 break;
                             case 2:
                                 r1 = Code.extR8(com, 0);
@@ -496,7 +496,8 @@ public abstract class Executor {
                             case 1:
                                 r1 = Code.extRM(com, 4);
                                 r2 = Code.extRM(com, 0);
-                                cpu.regs8[r1].value = cpu.regs8[r2].value;
+                                cpu.regs16[r1].rH.value = cpu.regs16[r2].rH.value;
+                                cpu.regs16[r1].rL.value = cpu.regs16[r2].rL.value;
                                 break;
                             case 2:
                                 r1 = Code.extR8(com, 4);

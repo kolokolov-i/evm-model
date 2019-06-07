@@ -45,7 +45,7 @@ public class CPU {
     public void execute(short command) {
         Executor exe = parse(command);
         exe.execute(this, command);
-        System.out.printf("%04X\n", command);
+        //System.out.printf("%04X\n", command);
     }
 
     public void stackPushWord(short v) {

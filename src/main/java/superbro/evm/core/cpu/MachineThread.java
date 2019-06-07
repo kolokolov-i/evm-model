@@ -14,7 +14,6 @@ public class MachineThread extends Thread {
     public void run(){
         boolean flag = true;
         while(flag){
-            System.out.println("step!");
             machine.step();
             try{
                 Thread.sleep(20);

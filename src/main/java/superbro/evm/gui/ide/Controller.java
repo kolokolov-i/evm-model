@@ -66,7 +66,17 @@ public class Controller implements Initializable {
         if(code == null){
             return;
         }
-        machine.uploadCode(pageList.getValue(), code);
+        if(selectedMachine.status == MachineManager.Status.IDLE){
+            machine.uploadCode(pageList.getValue(), code);
+            selectedMachine.save();
+        }
+        else{
+            Alert alert = new Alert(Alert.AlertType.NONE);
+            alert.setTitle("Upload program");
+            alert.setHeaderText("Machine must be loaded and stopped");
+            alert.setContentText(selectedMachine.title);
+            alert.showAndWait();
+        }
     }
 
     @FXML

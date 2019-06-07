@@ -101,7 +101,7 @@ class Instruct {
             words.put("R" + i, rr8[i]);
         }
         for (int i = 0; i < 4; i++) {
-            words.put("RM" + i, new Argument.Reg16(0, rr8[2 * i], rr8[2 * i + 1]));
+            words.put("RM" + i, new Argument.Reg16(i, rr8[2 * i], rr8[2 * i + 1]));
         }
         for (int i = 0; i < 32; i++) {
             words.put("P" + i, new Argument.Port(i));

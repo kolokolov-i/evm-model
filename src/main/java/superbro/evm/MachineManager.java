@@ -121,6 +121,10 @@ public class MachineManager {
             }
             status = Status.IDLE;
             instance.poweroff();
+            save();
+        }
+
+        public void save(){
             try {
                 Machine.saveTo(instance, Config.machinesDirectory.resolve(name));
             } catch (IOException e) {
