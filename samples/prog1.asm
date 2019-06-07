@@ -1,11 +1,7 @@
-mov R0, 0
-mov R1, 0
-mov R2, 0
-mov R3, 0
-mov R4, 0
-mov R5, 2
-mov R6, 0
-mov R7, 10
+mov RM0, 0
+mov RM1, 0
+mov RM2, 2
+mov RM3, 10
 Loop:
 storx [RM1], RM0
 inc RM0

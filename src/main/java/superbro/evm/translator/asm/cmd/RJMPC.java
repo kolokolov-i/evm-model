@@ -7,13 +7,15 @@ import java.util.List;
 public class RJMPC extends Command {
     @Override
     public void generate(List<Short> rr, Argument arg1, Argument arg2) throws ParserException {
-        if (arg1.type != Type.NUMBER) {
-            throw ParserException.invalidArgumentType();
+        if (arg1.type == Type.NUMBER) {
+            rr.add(Code.gen_N8(0x0A00, arg1));
+            return;
         }
-        rr.add(Code.gen_N8(0x0A00, arg1));
-        if (arg2.type != Type.NONE) {
-            throw ParserException.redundantArgument();
+        else if(arg1.type == Type.REL_ADDRESS){
+            rr.add(Code.gen_N8(0x0A00, ((Argument.RelAddress)arg1).offset));
+            return;
         }
+        throw ParserException.redundantArgument();
     }
 
     @Override

@@ -90,26 +90,29 @@ class Instruct {
 
     private static HashMap<String, Argument> words;
     private static Map<String, Label> labels;
+    private static List<Argument.RelAddress> unresolvedLinks;
     private static Map<String, Argument.Address> vars;
 
     static {
         words = new HashMap<>();
         Argument.Reg8[] rr8 = new Argument.Reg8[8];
         for (int i = 0; i < 8; i++) {
-            rr8[i] =  new Argument.Reg8(i);
+            rr8[i] = new Argument.Reg8(i);
             words.put("R" + i, rr8[i]);
         }
         for (int i = 0; i < 4; i++) {
-            words.put("RM"+i, new Argument.Reg16(0, rr8[2*i], rr8[2*i+1]));
+            words.put("RM" + i, new Argument.Reg16(0, rr8[2 * i], rr8[2 * i + 1]));
         }
         for (int i = 0; i < 32; i++) {
             words.put("P" + i, new Argument.Port(i));
         }
         labels = new HashMap<>();
+        unresolvedLinks = new ArrayList<>();
     }
 
     static void reset(Map<String, Argument.Address> v) {
         labels.clear();
+        unresolvedLinks.clear();
         vars = v;
     }
 
@@ -143,27 +146,27 @@ class Instruct {
 
     public static void generate(List<Instruct> instructs, ArrayList<Short> raw, StringBuilder listiner, Messager messager) {
         Instruct.instructs = instructs;
-        calculateOffsets();
+        calculateOffsets(messager);
         int i = 0;
         for (Instruct j : instructs) {
             try {
                 j.generate(raw);
                 int tt = j.size;
                 listiner.append(String.format("%04X : %04X : %s ", j.offset, raw.get(i), j.opcode.toString()));
-                if(j.arg1Token !=null){
+                if (j.arg1Token != null) {
                     listiner.append(j.arg1Token.toString());
-                    if(j.arg2Token !=null){
+                    if (j.arg2Token != null) {
                         listiner.append(", ");
                         listiner.append(j.arg2Token.toString());
                     }
                 }
                 listiner.append('\n');
-                for(int n=1; n<tt; n++){
-                    listiner.append(String.format("%04X : %04X\n", j.offset+n, raw.get(i+n)));
+                for (int n = 1; n < tt; n++) {
+                    listiner.append(String.format("%04X : %04X\n", j.offset + n, raw.get(i + n)));
                 }
-                i+=tt;
+                i += tt;
             } catch (ParserException ex) {
-                switch(ex.type){
+                switch (ex.type) {
                     case ERROR:
                         messager.error(j.line, 0, ex.getMessage());
                         break;
@@ -174,11 +177,19 @@ class Instruct {
         }
     }
 
-    private static void calculateOffsets() {
+    private static void calculateOffsets(Messager messager) {
         int t = 0;
         for (Instruct ins : instructs) {
             ins.offset = t;
             t += ins.size;
+        }
+        for (Argument.RelAddress link : unresolvedLinks) {
+            int r = link.target.target.offset - link.holder.offset;
+            if (r > 127 || r < -128) {
+                messager.error(link.holder.line, 0, "Label is unreachable");
+                r = 0;
+            }
+            link.offset = r;
         }
     }
 
@@ -199,11 +210,9 @@ class Instruct {
                 return words.get(s);
             }
             if (labels.containsKey(s)) {
-                int offset = this.offset - labels.get(s).target.offset;
-                if (offset > 127 || offset < -128) {
-                    throw new ParserException("Label is unreachable");
-                }
-                return new Argument.RelAddress((byte) offset);
+                Argument.RelAddress link = new Argument.RelAddress(this, labels.get(s));
+                unresolvedLinks.add(link);
+                return link;
             }
             if (vars.containsKey(s)) {
                 return vars.get(s);

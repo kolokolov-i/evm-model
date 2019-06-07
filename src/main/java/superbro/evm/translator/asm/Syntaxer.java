@@ -29,7 +29,7 @@ public class Syntaxer {
             Token token = toks.next();
             switch (state) {
                 case S0:
-                    tLabel = null;
+                    //tLabel = null;
                     tCommand = null;
                     arg1 = null;
                     arg2 = null;
@@ -350,6 +350,7 @@ public class Syntaxer {
 
     private void createInstruction() throws ParserException {
         Instruct instruction = new Instruct(tLabel, tCommand, arg1, arg2);
+        tLabel = null;
         result.add(instruction);
     }
 

@@ -62,6 +62,12 @@ public class Code {
         return r;
     }
 
+    public static short gen_N8(int base, int a1){
+        short r = (short) base;
+        r |= a1 & 0xff;
+        return r;
+    }
+
     public static short form_R8(int base, Argument a, int shifting){
         return (short)(base | (((Argument.Reg8)a).value << shifting));
     }
