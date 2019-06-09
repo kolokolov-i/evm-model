@@ -1,5 +1,7 @@
 package superbro.evm;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.scene.control.Alert;
 import superbro.evm.core.Machine;
 import superbro.evm.gui.inspector.Controller;
@@ -21,6 +23,8 @@ public class MachineManager {
                     m.instance = Machine.loadFrom(path);
                     m.status = Status.IDLE;
                     m.description = "Ready";
+                    m.instance.holderItem = m;
+                    m.statusProp = new SimpleObjectProperty<>(m.status);
                 } catch (Exception e) {
                     e.printStackTrace();
                     m.instance = null;
@@ -53,6 +57,7 @@ public class MachineManager {
             } else {
                 Files.createDirectory(path);
                 machine.instance = Machine.getStandardInstance();
+                machine.instance.holderItem = machine;
                 Machine.saveTo(machine.instance, path);
             }
             machines.add(machine);
@@ -82,6 +87,7 @@ public class MachineManager {
         public String title;
         transient public Machine instance;
         transient public Status status;
+        transient public ObjectProperty<Status> statusProp;
         transient public String description;
         transient public Controller inspectorController;
 
@@ -89,6 +95,7 @@ public class MachineManager {
             this.title = title;
             this.name = title.toUpperCase();
             this.status = Status.IDLE;
+            statusProp = new SimpleObjectProperty<>(status);
         }
 
         public void start() {
@@ -130,6 +137,18 @@ public class MachineManager {
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+
+        public Status getStatusProp() {
+            return statusProp.get();
+        }
+
+        public ObjectProperty<Status> statusPropProperty() {
+            return statusProp;
+        }
+
+        public void setStatusProp(Status statusProp) {
+            this.statusProp.set(statusProp);
         }
     }
 

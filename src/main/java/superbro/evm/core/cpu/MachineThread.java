@@ -8,6 +8,7 @@ public class MachineThread extends Thread {
 
     public MachineThread(Machine m){
         machine = m;
+        this.setDaemon(true);
     }
 
     @Override
@@ -15,6 +16,7 @@ public class MachineThread extends Thread {
         boolean flag = true;
         while(flag){
             machine.step();
+            machine.handleDevices();
             try{
                 Thread.sleep(20);
             }

@@ -164,6 +164,12 @@ public class Controller implements Initializable {
         for(int i = 0; i<16; i++){
             interrupts.getItems().add(cpu.interrupts[i].value);
         }
+//        Reg8[] ports = machine.cpu.ports;
+//        for(int i = 0; i< 8; i++){
+//            portsData.add(new PortsInfo(
+//                    ports[4*i], ports[4*i+1], ports[4*i+2], ports[4*i+3],
+//                    machine.devices[i].getName()));
+//        }
     }
 
     @FXML

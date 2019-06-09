@@ -1,6 +1,7 @@
 package superbro.evm.core.device;
 
 import superbro.evm.core.Device;
+import superbro.evm.core.Machine;
 
 import javax.swing.*;
 
@@ -8,12 +9,13 @@ public class Empty extends Device {
 
     public static class Builder extends DeviceBuilder {
         @Override
-        public Device create() {
-            return new Empty();
+        public Device create(Machine m) {
+            return new Empty(m);
         }
     }
 
-    public Empty() {
+    private Empty(Machine m) {
+        super(m);
     }
 
     @Override
@@ -29,5 +31,10 @@ public class Empty extends Device {
     @Override
     public String getName() {
         return "Empty";
+    }
+
+    @Override
+    protected void handle(DeviceCall call) {
+        System.out.println("Device empty is called");
     }
 }

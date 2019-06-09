@@ -34,6 +34,8 @@
                              <items>
                                  <Label text="Page" />
                                  <ComboBox fx:id="pageListCode" onAction="#updateHexCode" prefWidth="65.0" />
+                                 <Button mnemonicParsing="false" text="&lt;" />
+                                 <Button mnemonicParsing="false" text="&gt;" />
                              </items>
                            </ToolBar>
                         </top>
@@ -51,6 +53,8 @@
                               <items>
                                  <Label text="Page" />
                                  <ComboBox fx:id="pageListData" onAction="#updateHexData" prefWidth="65.0" />
+                                 <Button mnemonicParsing="false" text="&lt;" />
+                                 <Button mnemonicParsing="false" text="&gt;" />
                               </items>
                            </ToolBar>
                         </top>
@@ -68,6 +72,8 @@
                               <items>
                                  <Label text="Page" />
                                  <ComboBox fx:id="pageListStack" onAction="#updateHexStack" prefWidth="65.0" />
+                                 <Button mnemonicParsing="false" text="&lt;" />
+                                 <Button mnemonicParsing="false" text="&gt;" />
                               </items>
                            </ToolBar>
                         </top>
@@ -103,6 +109,7 @@
          </center>
          <top>
              <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
+               <Button mnemonicParsing="false" onAction="#updateView" text="Update" />
                  <Button mnemonicParsing="false" text="Save to file" />
                <Button mnemonicParsing="false" text="Load from file" />
                <Button mnemonicParsing="false" text="Fill" />
@@ -121,7 +128,7 @@
                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-            <RowConstraints minHeight="10.0" prefHeight="5.0" vgrow="SOMETIMES" />
+            <RowConstraints fillHeight="false" minHeight="10.0" prefHeight="10.0" vgrow="NEVER" />
                <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
                <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />
                <RowConstraints minHeight="10.0" prefHeight="25.0" vgrow="SOMETIMES" />

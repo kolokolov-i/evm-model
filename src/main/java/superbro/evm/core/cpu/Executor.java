@@ -16,49 +16,52 @@ public abstract class Executor {
             CALL = new Executor() {
                 @Override
                 public void execute(CPU cpu, short com) {
+                    short t = cpu.BP.value;
+                    cpu.BP.value = cpu.SP.value;
+                    cpu.stackPushWord(t);
                     cpu.stackPushWord(cpu.PC.value);
                     cpu.PC.value = cpu.regs16[Code.extRM(com, 0)].getValue();
-                    // TODO CALL regBP=?
                 }
             },
             RCALL = new Executor() {
                 @Override
                 public void execute(CPU cpu, short com) {
                     cpu.stackPushWord(cpu.PC.value);
+                    cpu.stackPushWord(cpu.BP.value);
+                    cpu.BP.value = cpu.SP.value;
                     cpu.PC.value += Code.extN8(com);
-                    // TODO RCALL regBP=?
                 }
             },
             RET = new Executor() {
                 @Override
                 public void execute(CPU cpu, short com) {
                     cpu.PC.value = cpu.stackPopWord();
-                    // TODO RET regBP=?
+                    cpu.BP.value = cpu.stackPopWord();
                 }
             },
             RETN = new Executor() {
                 @Override
                 public void execute(CPU cpu, short com) {
                     cpu.PC.value = cpu.stackPopWord();
+                    cpu.BP.value = cpu.stackPopWord();
                     int t = Code.extN8(com);
                     if (cpu.SP.value + t > 0xFFFF) {
-                        // TODO interrupt Stack empty
+                        cpu.fatalInt(CPU.Interrupt.STACK_EMPTY);
+                        return;
                     }
                     cpu.SP.value += t;
-                    // TODO RETN regBP=?
                 }
             },
             INT = new Executor() {
                 @Override
                 public void execute(CPU cpu, short com) {
-                    cpu.interrupt(Code.extN4(com, 0));
+                    cpu.callInterrupt(Code.extN4(com, 0));
                 }
             },
             IRET = new Executor() {
                 @Override
                 public void execute(CPU cpu, short com) {
-                    cpu.RF.value = cpu.stackPopByte();
-                    cpu.PC.value = cpu.stackPopWord();
+                    cpu.returnExtInt();
                 }
             },
             JUMP = new Executor() {

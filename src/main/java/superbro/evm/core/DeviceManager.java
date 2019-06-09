@@ -1,7 +1,7 @@
 package superbro.evm.core;
 
 import superbro.evm.core.device.*;
-import superbro.evm.core.device.System;
+import superbro.evm.core.device.Chipset;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -12,17 +12,17 @@ public class DeviceManager {
 
     static {
         builders = new HashMap<>();
-        builders.put("System", new System.Builder());
+        builders.put("System", new Chipset.Builder());
         builders.put("Keyboard", new Keyboard.Builder());
         builders.put("Empty", new Empty.Builder());
     }
 
-    static Device get(String type) {
+    static Device get(String type, Machine m) {
         Device.DeviceBuilder builder = builders.get(type);
         if (builder == null) {
             return null;
         }
-        return builder.create();
+        return builder.create(m);
     }
 
     public static void registrate(String name, Device.DeviceBuilder builder) {

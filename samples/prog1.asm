@@ -8,5 +8,6 @@ inc RM0
 add RM1, RM2
 cmp RM0, RM3
 jmpnz Loop
-mov R0, 1
-int 7
+mov R0, 0xFF
+put P0, R0
+int 8

@@ -1,6 +1,7 @@
 package superbro.evm.core.device;
 
 import superbro.evm.core.Device;
+import superbro.evm.core.Machine;
 
 import javax.swing.*;
 
@@ -8,12 +9,13 @@ public class Keyboard extends Device {
 
     public static class Builder extends DeviceBuilder {
         @Override
-        public Device create() {
-            return new Keyboard();
+        public Device create(Machine m) {
+            return new Keyboard(m);
         }
     }
 
-    public Keyboard() {
+    private Keyboard(Machine m) {
+        super(m);
     }
 
     @Override
@@ -29,5 +31,10 @@ public class Keyboard extends Device {
     @Override
     public String getName() {
         return "Keyboard";
+    }
+
+    @Override
+    protected void handle(DeviceCall call) {
+        System.out.println("Device Keyboard is called");
     }
 }

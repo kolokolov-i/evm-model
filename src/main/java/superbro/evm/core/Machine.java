@@ -1,8 +1,11 @@
 package superbro.evm.core;
 
 import com.google.gson.*;
+import superbro.evm.MachineManager;
 import superbro.evm.core.cpu.MachineThread;
+import superbro.evm.core.device.Chipset;
 import superbro.evm.core.device.Empty;
+import superbro.evm.core.device.Keyboard;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -16,14 +19,14 @@ import java.nio.file.StandardOpenOption;
 public class Machine {
 
     public Device[] devices;
-    private boolean[] devAutostart;
-    public Memory.Byte
-            memoryData, memoryStack;
-    public Memory.Word
-            memoryBIOS, memoryCode;
+    public Memory.Byte memoryData, memoryStack;
+    private Memory.Word memoryBIOS;
+    public Memory.Word memoryCode;
     private String modelBIOS;
     public CPU cpu;
     private MachineThread machineThread;
+
+    public MachineManager.MachineItem holderItem;
 
     private static Memory.Word stdBIOS;
 
@@ -90,31 +93,47 @@ public class Machine {
 
     public Machine() {
         devices = new Device[8];
-        devAutostart = new boolean[8];
-        for (int i = 0; i < 8; i++) {
-            devices[i] = new Empty();
-            devAutostart[i] = false;
-        }
+        devices[0] = new Chipset.Builder().create(this);
+        devices[1] = new Keyboard.Builder().create(this);
+        devices[2] = new Empty.Builder().create(this);
+        devices[3] = new Empty.Builder().create(this);
+        devices[4] = new Empty.Builder().create(this);
+        devices[5] = new Empty.Builder().create(this);
+        devices[6] = new Empty.Builder().create(this);
+        devices[7] = new Empty.Builder().create(this);
         this.cpu = new CPU(this);
     }
 
     public void step() {
+        //System.out.println("Machine step");
         short command = memoryCode.data[cpu.PC.value];
         cpu.execute(command);
     }
 
     public void start() {
         machineThread = new MachineThread(this);
+        for (int i = 0; i < 8; i++) {
+            if(devices[i].isAutostart()){
+                devices[i].launch();
+            }
+        }
         machineThread.start();
     }
 
     public void pause() {
-        machineThread.interrupt();
+        if(machineThread!=null){
+            machineThread.interrupt();
+        }
+        holderItem.status = MachineManager.Status.PAUSE;
     }
 
     public void poweroff() {
         cpu.reset();
-        machineThread.interrupt();
+        if(machineThread!=null){
+            machineThread.interrupt();
+        }
+        holderItem.status = MachineManager.Status.IDLE;
+        holderItem.statusProp.setValue(MachineManager.Status.IDLE);
     }
 
     public void reset() {
@@ -123,22 +142,28 @@ public class Machine {
         machineThread.start();
     }
 
-    public void uploadCode(int page, short[] src){
-        int i = page*256;
-        if(i>65536){
+    public void handleDevices(){
+        for (int i = 0; i < 8; i++) {
+            devices[i].handleCall();
+        }
+    }
+
+    public void uploadCode(int page, short[] src) {
+        int i = page * 256;
+        if (i > 65536) {
             return;
         }
-        for(int j =0; j<src.length; i++, j++){
+        for (int j = 0; j < src.length; i++, j++) {
             memoryCode.data[i] = src[j];
         }
     }
 
-    public void uploadData(int page, byte[] src){
-        int i = page*256;
-        if(i>65536){
+    public void uploadData(int page, byte[] src) {
+        int i = page * 256;
+        if (i > 65536) {
             return;
         }
-        for(int j =0; j<src.length; i++, j++){
+        for (int j = 0; j < src.length; i++, j++) {
             memoryData.data[i] = src[j];
         }
     }
@@ -159,9 +184,9 @@ public class Machine {
             for (int i = 0; i < 8; i++) {
                 if (devices.has("dev" + i)) {
                     JsonObject devObj = devices.get("dev" + i).getAsJsonObject();
-                    Device dev = DeviceManager.get(devObj.get("name").getAsString());
+                    Device dev = DeviceManager.get(devObj.get("name").getAsString(), result);
                     result.devices[i] = dev;
-                    result.devAutostart[i] = devObj.get("autostart").getAsBoolean();
+                    dev.autostart = devObj.get("autostart").getAsBoolean();
                 }
             }
             return result;
@@ -177,7 +202,7 @@ public class Machine {
             for (int i = 0; i < 8; i++) {
                 JsonObject devObj = new JsonObject();
                 devObj.addProperty("name", machine.devices[i].getName());
-                devObj.addProperty("autostart", machine.devAutostart[i]);
+                devObj.addProperty("autostart", machine.devices[i].autostart);
                 devices.add("dev" + i, devObj);
             }
             result.add("devices", devices);

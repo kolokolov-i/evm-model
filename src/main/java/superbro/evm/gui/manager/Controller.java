@@ -1,5 +1,7 @@
 package superbro.evm.gui.manager;
 
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.SimpleObjectProperty;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -15,6 +17,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.stream.Collectors;
 
 public class Controller implements Initializable {
 
@@ -37,7 +40,7 @@ public class Controller implements Initializable {
     @FXML
     private Button btnInspector;
     @FXML
-    private ListView<MachineManager.MachineItem> mList;
+    private ListView<MachineListItem> mList;
     @FXML
     private Rectangle rectGreen;
 
@@ -63,11 +66,16 @@ public class Controller implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        //System.out.println("controller init");
+        //Chipset.out.println("controller init");
         updateMachinesList();
         mList.setCellFactory(machineListView -> new MachineListViewCell());
         mList.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
-            selectedMachine = newValue;
+            if(newValue==null){
+                //selectedMachine = null;
+            }
+            else{
+                selectedMachine = newValue.machine.get();
+            }
             updateViewForMachine();
         });
     }
@@ -157,7 +165,8 @@ public class Controller implements Initializable {
     }
 
     private void updateMachinesList() {
-        mList.setItems(FXCollections.observableArrayList(MachineManager.getMachines()));
+        mList.setItems(FXCollections.observableArrayList(
+                        MachineManager.getMachines().stream().map(t -> new MachineListItem(t)).collect(Collectors.toList())));
         mList.refresh();
     }
 
@@ -174,10 +183,10 @@ public class Controller implements Initializable {
 
     }
 
-    class MachineListViewCell extends ListCell<MachineManager.MachineItem> {
+    class MachineListViewCell extends ListCell<MachineListItem> {
 
         @Override
-        protected void updateItem(MachineManager.MachineItem item, boolean empty) {
+        protected void updateItem(MachineListItem item, boolean empty) {
             super.updateItem(item, empty);
             if (empty) {
                 setText("");
@@ -189,7 +198,7 @@ public class Controller implements Initializable {
             }
             Color c;
             String state;
-            switch (item.status) {
+            switch (item.status.get()) {
                 case RUN:
                     c = Color.rgb(0, 140, 70);
                     state = " [ RUN ]";
@@ -207,8 +216,50 @@ public class Controller implements Initializable {
                     c = Color.BLACK;
                     state = "";
             }
-            setText(item.title + state);
+            setText(item.machine.get().title + state);
             setTextFill(c);
+        }
+    }
+
+    private class MachineListItem {
+        private ObjectProperty<MachineManager.MachineItem> machine;
+        private ObjectProperty<MachineManager.Status> status;
+
+        public MachineListItem(MachineManager.MachineItem machine) {
+            this.machine = new SimpleObjectProperty<>(machine);
+            this.status = new SimpleObjectProperty<>(machine.status);
+//            status.bind(machine.statusProp);
+//            status.addListener(new ChangeListener(){
+//                @Override public void changed(ObservableValue o, Object oldVal,
+//                                              Object newVal){
+//                    System.out.println("Status has changed!");
+//                }
+//            });
+            //Bindings.bindBidirectional(this.statusProperty(), );
+        }
+
+        public MachineManager.MachineItem getMachine() {
+            return machine.get();
+        }
+
+        public ObjectProperty<MachineManager.MachineItem> machineProperty() {
+            return machine;
+        }
+
+        public void setMachine(MachineManager.MachineItem machine) {
+            this.machine.set(machine);
+        }
+
+        public MachineManager.Status getStatus() {
+            return status.get();
+        }
+
+        public ObjectProperty<MachineManager.Status> statusProperty() {
+            return status;
+        }
+
+        public void setStatus(MachineManager.Status status) {
+            this.status.set(status);
         }
     }
 }

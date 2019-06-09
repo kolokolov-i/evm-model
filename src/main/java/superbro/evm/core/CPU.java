@@ -1,6 +1,10 @@
 package superbro.evm.core;
 
 import superbro.evm.core.cpu.*;
+import superbro.evm.core.device.DeviceCall;
+
+import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 public class CPU {
 
@@ -11,6 +15,8 @@ public class CPU {
     public Reg8 RI, RF;
     public Reg16 PC, IR, SP, BP;
     public Reg16[] interrupts;
+    private Queue<IntEvent> intQueue;
+    private boolean extIntNow;
 
     CPU(Machine holder) {
         machine = holder;
@@ -36,41 +42,63 @@ public class CPU {
         for (int i = 0; i < 32; i++) {
             ports[i] = new Reg8();
         }
+        reset();
     }
 
     public void reset() {
         PC.value = 0;
+        SP.value = (short) 0xFFFF;
+        BP.value = SP.value;
+        intQueue = new ConcurrentLinkedQueue<>();
+        extIntNow = false;
     }
 
     public void execute(short command) {
         Executor exe = parse(command);
         exe.execute(this, command);
-        //System.out.printf("%04X\n", command);
+        if(!extIntNow){
+            IntEvent event = intQueue.poll();
+            if(event!=null) {
+                stackPushByte(RF.value);
+                stackPushByte(RI.value);
+                stackPushByte(regs16[0].rH.value);
+                stackPushByte(regs16[0].rL.value);
+                stackPushByte(regs16[1].rH.value);
+                stackPushByte(regs16[1].rL.value);
+                stackPushByte(regs16[2].rH.value);
+                stackPushByte(regs16[2].rL.value);
+                stackPushByte(regs16[3].rH.value);
+                stackPushByte(regs16[3].rL.value);
+                extIntNow = true;
+                stackPushWord(PC.value);
+                PC.value = interrupts[event.target.ordinal()].value;
+            }
+        }
     }
 
     public void stackPushWord(short v) {
-        int sp = 0 | SP.value;
+        int sp = SP.value;
         if (sp <= 0x0001) {
-            // TODO interrupt Stack Overflow
+            fatalInt(Interrupt.STACK_OVERFLOW);
         }
-        machine.memoryStack.data[sp] = (byte) (v >> 8);
-        machine.memoryStack.data[sp + 1] = (byte) (v);
+        machine.memoryStack.data[sp - 1] = (byte) (v >> 8);
+        machine.memoryStack.data[sp] = (byte) (v);
         SP.value = (short) (sp - 2);
     }
 
     public void stackPushByte(byte v) {
-        int sp = 0 | SP.value;
+        int sp = SP.value;
         if (sp == 0x0000) {
-            // TODO interrupt Stack Overflow
+            fatalInt(Interrupt.STACK_OVERFLOW);
         }
         machine.memoryStack.data[sp] = v;
         SP.value = (short) (sp - 1);
     }
 
     public short stackPopWord() {
-        int sp = 0 | SP.value;
+        int sp = SP.value;
         if (sp >= 0xFFFE) {
-            // TODO interrupt Stack empty
+            fatalInt(Interrupt.STACK_EMPTY);
         }
         short r;
         r = machine.memoryStack.data[sp];
@@ -80,9 +108,9 @@ public class CPU {
     }
 
     public byte stackPopByte() {
-        int sp = 0 | SP.value;
-        if (sp == 0xFFFF) {
-            // TODO interrupt Stack empty
+        int sp = SP.value;
+        if (sp >= 0xFFFF) {
+            fatalInt(Interrupt.STACK_EMPTY);
         }
         byte r;
         r = machine.memoryStack.data[sp];
@@ -90,64 +118,101 @@ public class CPU {
         return r;
     }
 
-    public byte readByteData(int adr){
-        if(adr >= 0x10000){
-            // TODO interrupt Memory error
+    public byte readByteData(int adr) {
+        if (adr >= 0x10000) {
+            fatalInt(Interrupt.MEMORY_ERROR);
         }
         return machine.memoryData.data[adr];
     }
 
-    public short readWordData(int adr){
-        if(adr >= 0xFFFF){
-            // TODO interrupt Memory error
+    public short readWordData(int adr) {
+        if (adr >= 0xFFFF) {
+            fatalInt(Interrupt.MEMORY_ERROR);
         }
         byte t1 = machine.memoryData.data[adr];
-        byte t2 = machine.memoryData.data[adr+1];
-        return (short) ((t1<<8) | t2);
+        byte t2 = machine.memoryData.data[adr + 1];
+        return (short) ((t1 << 8) | t2);
     }
 
-    public void writeByteData(int adr, byte v){
-        if(adr >= 0x10000){
-            // TODO interrupt Memory error
+    public void writeByteData(int adr, byte v) {
+        if (adr >= 0x10000) {
+            fatalInt(Interrupt.MEMORY_ERROR);
         }
         machine.memoryData.data[adr] = v;
     }
 
-    public void writeWordData(int adr, short v){
-        if(adr >= 0xFFFF){
-            // TODO interrupt Memory error
+    public void writeWordData(int adr, short v) {
+        if (adr >= 0xFFFF) {
+            fatalInt(Interrupt.MEMORY_ERROR);
         }
         machine.memoryData.data[adr] = (byte) (v >> 8);
-        machine.memoryData.data[adr+1] = (byte) v;
+        machine.memoryData.data[adr + 1] = (byte) v;
     }
 
-    public byte stackReadByte(int offset){
+    public byte stackReadByte(int offset) {
         int adr = BP.value - offset;
-        if(adr < 0 || adr >0xFFFF){
-            // TODO interrupt Memory error
+        if (adr < 0 || adr > 0xFFFF) {
+            fatalInt(Interrupt.MEMORY_ERROR);
         }
         return machine.memoryStack.data[adr];
     }
 
-    public short stackReadWord(int offset){
+    public short stackReadWord(int offset) {
         int adr = BP.value - offset;
-        if(adr < 0 || adr >0xFFFE){
-            // TODO interrupt Memory error
+        if (adr < 0 || adr > 0xFFFE) {
+            fatalInt(Interrupt.MEMORY_ERROR);
         }
         byte t1 = machine.memoryData.data[adr];
-        byte t2 = machine.memoryData.data[adr+1];
-        return (short) ((t1<<8) | t2);
+        byte t2 = machine.memoryData.data[adr + 1];
+        return (short) ((t1 << 8) | t2);
     }
 
-    public void interrupt(int n) {
-        boolean f = false;
-        // TODO check RI
-        if (!f) {
-            PC.value++;
+    public void fatalInt(Interrupt n) {
+        stackPushWord(PC.value);
+        PC.value = interrupts[n.ordinal()].value;
+    }
+
+    public void externalInt(int n) {
+        if (n >= 8) {
             return;
         }
-        stackPushWord(PC.value);
+        if ((RI.value & (1 << n)) == 0) {
+            return;
+        }
+        intQueue.offer(new IntEvent(true, Interrupt.from(n)));
+    }
+
+    public void returnExtInt() {
+        PC.value = stackPopWord();
+        stackPushByte(regs16[3].rL.value);
+        stackPushByte(regs16[3].rH.value);
+        stackPushByte(regs16[2].rL.value);
+        stackPushByte(regs16[2].rH.value);
+        stackPushByte(regs16[1].rL.value);
+        stackPushByte(regs16[1].rH.value);
+        stackPushByte(regs16[0].rL.value);
+        stackPushByte(regs16[0].rH.value);
+        stackPushByte(RI.value);
         stackPushByte(RF.value);
+        extIntNow = false;
+    }
+
+    public void callInterrupt(int n) {
+        if (n < 8) {
+            if(n == 7){
+                // call bios - change code segment
+            }
+            short t = BP.value;
+            BP.value = SP.value;
+            stackPushWord(t);
+            stackPushWord(PC.value);
+            PC.value = interrupts[n].value;
+        } else {
+            n -= 8;
+            machine.devices[n].call(new DeviceCall(
+                    ports[4*n], ports[4*n+1], ports[4*n+2], ports[4*n+3]
+            ));
+        }
     }
 
     private Executor parse(short command) {
@@ -339,9 +404,11 @@ public class CPU {
         int h3 = (command >> 4) & 0x0f;
         switch (h2) {
             case 1:
-                switch(h3){
-                    case 0: return Executor.LOADF;
-                    case 1: return Executor.STORF;
+                switch (h3) {
+                    case 0:
+                        return Executor.LOADF;
+                    case 1:
+                        return Executor.STORF;
                 }
                 return Executor.NOP;
             case 4:
@@ -349,21 +416,35 @@ public class CPU {
             case 6:
                 return Executor.GET;
             case 8:
-                switch(h3){
-                    case 0: return Executor.PUSHr8;
-                    case 1: return Executor.PUSHr16;
+                switch (h3) {
+                    case 0:
+                        return Executor.PUSHr8;
+                    case 1:
+                        return Executor.PUSHr16;
                 }
                 return Executor.NOP;
             case 9:
                 return Executor.PUSHi;
             case 10:
-                switch(h3){
-                    case 0: return Executor.POPr8;
-                    case 1: return Executor.POPr16;
+                switch (h3) {
+                    case 0:
+                        return Executor.POPr8;
+                    case 1:
+                        return Executor.POPr16;
                 }
                 return Executor.NOP;
             default:
                 return Executor.NOP;
+        }
+    }
+
+    public enum Interrupt {
+        RESET, ZERO_DIVISION, BAD_CODE, STACK_OVERFLOW,
+        STACK_EMPTY, MEMORY_ERROR, TRACE, BIOS,
+        DEV0, DEV1, DEV2, DEV3, DEV4, DEV5, DEV6, DEV7;
+
+        public static Interrupt from(int i) {
+            return Interrupt.values()[i];
         }
     }
 }
