@@ -12,4 +12,14 @@ public class DeviceCall {
         p2 = r2.value;
         p3 = r3.value;
     }
+
+    @Override
+    public String toString() {
+        return "DeviceCall{" +
+                "p0=" + p0 +
+                ", p1=" + p1 +
+                ", p2=" + p2 +
+                ", p3=" + p3 +
+                '}';
+    }
 }

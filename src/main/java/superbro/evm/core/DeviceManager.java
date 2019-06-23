@@ -13,6 +13,7 @@ public class DeviceManager {
     static {
         builders = new HashMap<>();
         builders.put("System", new Chipset.Builder());
+        builders.put("Display", new Display.Builder());
         builders.put("Keyboard", new Keyboard.Builder());
         builders.put("Empty", new Empty.Builder());
     }

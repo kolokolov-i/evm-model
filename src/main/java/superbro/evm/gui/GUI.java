@@ -95,15 +95,19 @@ public class GUI {
         stage.show();
     }
 
-    public static void showCodingDemo() throws IOException {
+    public static void showCodingDemo() {
         URL resource = GUI.class.getResource("/superbro/evm/gui/codingdemo/codingdemo.fxml");
         FXMLLoader fxmlLoader = new FXMLLoader(resource);
-        Parent root = fxmlLoader.load();
-        //superbro.evm.gui.inspector.Controller inspectorController = fxmlLoader.getController();
-        Stage stage = new Stage();
-        stage.setTitle("Демонстрация кода Хэмминга");
-        stage.setScene(new Scene(root, 600, 120));
-        stage.show();
+        try {
+            Parent root = fxmlLoader.load();
+            //superbro.evm.gui.inspector.Controller inspectorController = fxmlLoader.getController();
+            Stage stage = new Stage();
+            stage.setTitle("Демонстрация кода Хэмминга");
+            stage.setScene(new Scene(root, 600, 120));
+            stage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     public static Controller getManagerController() {

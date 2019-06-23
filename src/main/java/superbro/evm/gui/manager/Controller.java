@@ -40,6 +40,8 @@ public class Controller implements Initializable {
     @FXML
     private Button btnInspector;
     @FXML
+    private Button btnHamming;
+    @FXML
     private ListView<MachineListItem> mList;
     @FXML
     private Rectangle rectGreen;
@@ -162,6 +164,11 @@ public class Controller implements Initializable {
         } catch (IOException ex) {
             ex.printStackTrace();
         }
+    }
+
+    @FXML
+    public void btnHamming(ActionEvent e) {
+        GUI.showCodingDemo();
     }
 
     private void updateMachinesList() {

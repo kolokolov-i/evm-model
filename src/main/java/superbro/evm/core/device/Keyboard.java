@@ -16,6 +16,7 @@ public class Keyboard extends Device {
 
     private Keyboard(Machine m) {
         super(m);
+        autostart = true;
     }
 
     @Override

@@ -3,9 +3,7 @@ package superbro.evm.core;
 import com.google.gson.*;
 import superbro.evm.MachineManager;
 import superbro.evm.core.cpu.MachineThread;
-import superbro.evm.core.device.Chipset;
-import superbro.evm.core.device.Empty;
-import superbro.evm.core.device.Keyboard;
+import superbro.evm.core.device.*;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -94,8 +92,8 @@ public class Machine {
     public Machine() {
         devices = new Device[8];
         devices[0] = new Chipset.Builder().create(this);
-        devices[1] = new Keyboard.Builder().create(this);
-        devices[2] = new Empty.Builder().create(this);
+        devices[1] = new Display.Builder().create(this);
+        devices[2] = new Keyboard.Builder().create(this);
         devices[3] = new Empty.Builder().create(this);
         devices[4] = new Empty.Builder().create(this);
         devices[5] = new Empty.Builder().create(this);

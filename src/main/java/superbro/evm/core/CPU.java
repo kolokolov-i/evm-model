@@ -54,6 +54,7 @@ public class CPU {
     }
 
     public void execute(short command) {
+        IR.value = command;
         Executor exe = parse(command);
         exe.execute(this, command);
         if(!extIntNow){
@@ -212,6 +213,7 @@ public class CPU {
             machine.devices[n].call(new DeviceCall(
                     ports[4*n], ports[4*n+1], ports[4*n+2], ports[4*n+3]
             ));
+            PC.value++;
         }
     }
 
